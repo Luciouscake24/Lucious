@@ -1,0 +1,240 @@
+import React, { useState, useMemo, useEffect } from "react";
+import { useLocation } from "react-router-dom";
+import axios from "axios";
+import Navbar from "../../components/Navbar/Navbar";
+import Footer from "../../components/Footer/Footer";
+import ProductCard from "../../components/ProductCard/ProductCard";
+import "./ShopPage.css";
+
+/* 🎛️ Filter Lists */
+const flavoursList = ["chocolate","vanilla","butterscotch","red velvet","strawberry"];
+const dietList = ["egg","eggless"];
+const creamList = ["whipped","buttercream","truffle"];
+const weightList = ["500g","1kg","2kg"];
+
+const ShopPage = () => {
+
+  const location = useLocation();
+  const query = new URLSearchParams(location.search);
+
+  const categoryQuery = query.get("category");
+  const collectionQuery = query.get("collection");
+  const occasionQuery = query.get("occasion");
+
+  /* 🔥 API STATES */
+  const [products,setProducts] = useState([]);
+  const [categories,setCategories] = useState([]);
+  const [collections,setCollections] = useState([]);
+  const [occasions,setOccasions] = useState([]);
+  const [loading,setLoading] = useState(true);
+
+  /* 🎯 FILTER STATES */
+  const [sort, setSort] = useState("");
+  const [maxPrice, setMaxPrice] = useState(5000);
+  const [selectedFlavours, setSelectedFlavours] = useState([]);
+  const [selectedDiet, setSelectedDiet] = useState([]);
+  const [selectedCream, setSelectedCream] = useState([]);
+  const [selectedWeight, setSelectedWeight] = useState([]);
+
+  /* ⭐ Accordion */
+  const [openSection, setOpenSection] = useState(null);
+  const toggleSection = (section) =>
+    setOpenSection(prev => prev === section ? null : section);
+
+  const toggleFilter = (value, list, setList) => {
+    setList(prev =>
+      prev.includes(value)
+        ? prev.filter(i => i !== value)
+        : [...prev, value]
+    );
+  };
+
+  /* 🔥 FETCH ALL DATA */
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [prodRes, catRes, colRes, occRes] = await Promise.all([
+          axios.get("http://localhost:5000/api/product/list"),
+          axios.get("http://localhost:5000/api/meta/category"),
+          axios.get("http://localhost:5000/api/meta/collection"),
+          axios.get("http://localhost:5000/api/meta/occasion")
+        ]);
+
+        setProducts(prodRes.data);
+        setCategories(catRes.data);
+        setCollections(colRes.data);
+        setOccasions(occRes.data);
+
+        setLoading(false);
+      } catch (err) {
+        console.log(err);
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  /* 🧠 WAIT UNTIL DATA LOADS */
+  if (loading) {
+    return (
+      <>
+        <Navbar />
+        <div style={{padding:"120px", textAlign:"center"}}>
+          <h2>Loading cakes...</h2>
+        </div>
+        <Footer />
+      </>
+    );
+  }
+
+  /* 🧠 Page Title */
+  let pageTitle = "All Cakes";
+
+  if (categoryQuery)
+    pageTitle = categories.find(c=>c.slug===categoryQuery)?.name || "All Cakes";
+
+  if (collectionQuery)
+    pageTitle = collections.find(c=>c.slug===collectionQuery)?.name || "All Cakes";
+
+  if (occasionQuery)
+    pageTitle = occasions.find(o=>o.slug===occasionQuery)?.name || "All Cakes";
+
+  /* 🔎 FILTER ENGINE */
+  const filteredProducts = useMemo(() => {
+
+    let result = products;
+
+    if (categoryQuery)
+      result = result.filter(p => p.categoryId === categoryQuery);
+
+    if (collectionQuery)
+      result = result.filter(p => p.collectionId === collectionQuery);
+
+    if (occasionQuery)
+      result = result.filter(p => p.occasionId === occasionQuery);
+
+    if (selectedFlavours.length)
+      result = result.filter(p => selectedFlavours.includes(p.flavour));
+
+    if (selectedDiet.length)
+      result = result.filter(p => selectedDiet.includes(p.diet));
+
+    if (selectedCream.length)
+      result = result.filter(p => selectedCream.includes(p.cream));
+
+    if (selectedWeight.length)
+      result = result.filter(p => selectedWeight.includes(p.weight));
+
+    result = result.filter(p => p.price <= maxPrice);
+
+    if (sort === "low")
+      result = [...result].sort((a,b)=>a.price-b.price);
+
+    if (sort === "high")
+      result = [...result].sort((a,b)=>b.price-a.price);
+
+    return result;
+
+  }, [
+    products,
+    categoryQuery,
+    collectionQuery,
+    occasionQuery,
+    sort,
+    maxPrice,
+    selectedFlavours,
+    selectedDiet,
+    selectedCream,
+    selectedWeight
+  ]);
+
+  return (
+    <>
+      <Navbar />
+
+      <section className="shop-page">
+        <div className="shop-container">
+
+          {/* SIDEBAR */}
+          <aside className="sidebar">
+            <h3>Filters</h3>
+
+            <div className="filter-group">
+              <label>Sort by Price</label>
+              <select value={sort} onChange={e=>setSort(e.target.value)}>
+                <option value="">Default</option>
+                <option value="low">Low → High</option>
+                <option value="high">High → Low</option>
+              </select>
+            </div>
+
+            <div className="filter-group">
+              <label>Max Price: ₹{maxPrice}</label>
+              <input type="range"
+                min="100"
+                max="5000"
+                value={maxPrice}
+                onChange={e=>setMaxPrice(e.target.value)}
+              />
+            </div>
+
+            {/* FILTER ACCORDIONS */}
+            {[{title:"Flavours",list:flavoursList,state:selectedFlavours,set:setSelectedFlavours,key:"flavour"},
+              {title:"Dietary Preference",list:dietList,state:selectedDiet,set:setSelectedDiet,key:"diet"},
+              {title:"Cream Type",list:creamList,state:selectedCream,set:setSelectedCream,key:"cream"},
+              {title:"Weight",list:weightList,state:selectedWeight,set:setSelectedWeight,key:"weight"}
+            ].map(section=>(
+              <div key={section.key} className={`filter-group accordion ${openSection===section.key ? "open" : ""}`}>
+                <div className="accordion-header" onClick={()=>toggleSection(section.key)}>
+                  <label>{section.title}</label><span>+</span>
+                </div>
+                <div className="accordion-body">
+                  {section.list.map(item => (
+                    <div key={item} className="checkbox">
+                      <input type="checkbox"
+                        onChange={()=>toggleFilter(item, section.state, section.set)}
+                      />
+                      <span>{item}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+
+            <button className="clear-btn" onClick={()=>{
+              setSort(""); setMaxPrice(5000);
+              setSelectedFlavours([]); setSelectedDiet([]);
+              setSelectedCream([]); setSelectedWeight([]);
+            }}>
+              Reset Filters ✖
+            </button>
+
+          </aside>
+
+          {/* PRODUCTS */}
+          <div className="products-section">
+            <div className="shop-header">
+              <h2>{pageTitle}</h2>
+              <p>{filteredProducts.length} cakes found</p>
+            </div>
+
+            {filteredProducts.length === 0
+              ? <p className="empty-msg">No cakes found 😔</p>
+              : <div className="product-grid">
+                  {filteredProducts.map(product => (
+                    <ProductCard key={product._id} product={product}/>
+                  ))}
+                </div>
+            }
+          </div>
+
+        </div>
+      </section>
+
+      <Footer />
+    </>
+  );
+};
+
+export default ShopPage;

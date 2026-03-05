@@ -1,0 +1,23 @@
+.admin-navbar{
+  height:70px;
+  background:white;
+  border-bottom:1px solid #eee;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 30px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.04);
+}
+
+.admin-nav-right{
+  display:flex;
+  align-items:center;
+  gap:20px;
+}
+
+.admin-profile{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-weight:500;
+}

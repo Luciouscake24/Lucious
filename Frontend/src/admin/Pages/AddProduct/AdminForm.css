@@ -1,0 +1,21 @@
+.admin-form{
+  display:flex;
+  flex-direction:column;
+  gap:15px;
+  max-width:400px;
+}
+
+.admin-form input{
+  padding:10px;
+  border-radius:8px;
+  border:1px solid #ccc;
+}
+
+.admin-form button{
+  background:#ff5c8a;
+  color:white;
+  border:none;
+  padding:10px;
+  border-radius:8px;
+  cursor:pointer;
+}

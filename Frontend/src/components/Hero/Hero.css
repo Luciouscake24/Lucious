@@ -1,0 +1,109 @@
+.hero{
+  padding-top:80px;
+  min-height:90vh;
+  background: linear-gradient(180deg,#fff5f7,#ffeef2);
+  display:flex;
+  align-items:center;
+}
+
+.hero-container{
+  max-width:1300px;
+  margin:auto;
+  padding:40px 30px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:40px;
+}
+
+/* TEXT */
+.hero-text h1{
+  font-size:56px;
+  line-height:1.2;
+  color:#2b2b2b;
+  font-family:"Playfair Display";
+}
+
+.hero-text span{
+  color:rgb(230,90,120);
+}
+
+.hero-text p{
+  margin:20px 0 30px;
+  font-size:18px;
+  color:#555;
+  max-width:480px;
+  font-family:Poppins;
+}
+
+/* BUTTONS */
+.hero-buttons{
+  display:flex;
+  gap:20px;
+}
+
+.primary-btn{
+  background:rgb(230,90,120);
+  color:white;
+  border:none;
+  padding:14px 28px;
+  border-radius:30px;
+  font-size:16px;
+  cursor:pointer;
+  box-shadow:0 6px 18px rgba(230,90,120,0.4);
+  transition:.3s;
+}
+
+.primary-btn:hover{
+  transform:translateY(-3px);
+}
+
+.secondary-btn{
+  background:white;
+  border:2px solid rgb(230,90,120);
+  color:rgb(230,90,120);
+  padding:14px 28px;
+  border-radius:30px;
+  font-size:16px;
+  cursor:pointer;
+  transition:.3s;
+}
+
+.secondary-btn:hover{
+  background:rgb(230,90,120);
+  color:white;
+}
+
+/* IMAGE */
+.hero-image{
+  position:relative;
+}
+
+.hero-image img{
+  width:480px;
+  border-radius:30px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.15);
+}
+
+/* FLOATING CARDS */
+.floating-card{
+  position:absolute;
+  background:white;
+  padding:10px 18px;
+  border-radius:20px;
+  box-shadow:0 8px 20px rgba(0,0,0,0.1);
+  font-family:Poppins;
+  font-size:14px;
+  animation:float 4s ease-in-out infinite;
+}
+
+.card1{ top:20px; left:-40px; }
+.card2{ bottom:50px; right:-40px; animation-delay:1s; }
+.card3{ bottom:-20px; left:40px; animation-delay:2s; }
+
+@keyframes float{
+  0%{ transform:translateY(0px); }
+  50%{ transform:translateY(-10px); }
+  100%{ transform:translateY(0px); }
+}
+

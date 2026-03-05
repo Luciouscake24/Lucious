@@ -1,0 +1,54 @@
+.tag-page{
+  padding:30px;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.tag-form{
+  background:#fff;
+  padding:20px;
+  border-radius:14px;
+  box-shadow:0 8px 25px rgba(0,0,0,0.08);
+  display:flex;
+  gap:10px;
+  margin-bottom:30px;
+}
+
+.tag-form input{
+  padding:10px;
+  border:1px solid #ddd;
+  border-radius:8px;
+  min-width:200px;
+}
+
+.tag-form button{
+  background:#000;
+  color:#fff;
+  border:none;
+  padding:10px 20px;
+  border-radius:8px;
+  cursor:pointer;
+}
+
+.tag-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+  gap:20px;
+}
+
+.tag-card{
+  background:#fff;
+  padding:20px;
+  border-radius:12px;
+  box-shadow:0 10px 25px rgba(0,0,0,0.08);
+  text-align:center;
+}
+
+.tag-card button{
+  margin-top:10px;
+  background:red;
+  color:white;
+  border:none;
+  padding:6px 14px;
+  border-radius:6px;
+  cursor:pointer;
+}

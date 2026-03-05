@@ -1,0 +1,55 @@
+.cake-filter{
+  padding:30px 30px 40px;
+  background:#fff;
+  text-align:center;
+}
+
+.cake-filter h2{
+  font-family:"Playfair Display";
+  font-size:36px;
+  color:#2b2b2b;
+  margin-bottom:35px;
+}
+
+/* ROW */
+.filter-row{
+  display:flex;
+  gap:20px;
+  overflow-x:auto;
+  padding-bottom:30px;
+  justify-content:center;
+}
+
+/* CARD */
+.filter-card{
+  min-width:140px;
+  background:#fff5f7;
+  padding:22px 18px;
+  border-radius:20px;
+  cursor:pointer;
+  transition:.3s;
+  font-family:Poppins;
+  color:#444;
+  border:1px solid transparent;
+}
+
+.filter-card svg{
+  color:rgb(230,90,120);
+  margin-bottom:8px;
+}
+
+.filter-card:hover{
+  transform:translateY(-6px);
+  box-shadow:0 10px 25px rgba(0,0,0,0.08);
+}
+
+/* ACTIVE CARD */
+.filter-card.active{
+  background:rgb(230,90,120);
+  color:white;
+  box-shadow:0 10px 25px rgba(230,90,120,0.4);
+}
+
+.filter-card.active svg{
+  color:white;
+}

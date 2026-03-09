@@ -10,13 +10,23 @@ const CelebrationSection = () => {
   useEffect(() => {
     axios
       .get("http://localhost:5000/api/meta/occasion")
-      .then((res) => setOccasions(res.data))
+      .then((res) => {
+        setOccasions(res.data);
+      })
       .catch((err) => console.log(err));
   }, []);
 
+  const handleExplore = (slug) => {
+    if (slug) {
+      navigate(`/shop?occasion=${slug}`);
+    } else {
+      navigate("/shop");
+    }
+  };
+
   return (
     <section className="celebration">
-      <h2>Celebrate Every Occasion 🎉</h2>
+      <h2>Celebrate Every Occasion </h2>
 
       <div className="celebration-row">
         {occasions.length === 0 && (
@@ -25,19 +35,19 @@ const CelebrationSection = () => {
 
         {occasions.map((event) => (
           <div className="celebration-card" key={event._id}>
-            <img src={event.image} alt={event.name} />
+            
+            <div className="celebration-img">
+              <img src={event.image} alt={event.name} />
+            </div>
 
-            <div className="celebration-overlay">
+            <div className="celebration-content">
               <h3>{event.name}</h3>
 
-              <button
-                onClick={() =>
-                  navigate(`/shop?occasion=${event.slug}`)
-                }
-              >
+              <button onClick={() => handleExplore(event.slug)}>
                 Explore Cakes →
               </button>
             </div>
+
           </div>
         ))}
       </div>

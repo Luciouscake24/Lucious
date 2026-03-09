@@ -21,14 +21,12 @@ const ShopPage = () => {
   const collectionQuery = query.get("collection");
   const occasionQuery = query.get("occasion");
 
-  /* API STATES */
   const [products,setProducts] = useState([]);
   const [categories,setCategories] = useState([]);
   const [collections,setCollections] = useState([]);
   const [occasions,setOccasions] = useState([]);
   const [loading,setLoading] = useState(true);
 
-  /* FILTER STATES */
   const [sort, setSort] = useState("");
   const [maxPrice, setMaxPrice] = useState(5000);
   const [selectedFlavours, setSelectedFlavours] = useState([]);
@@ -36,7 +34,6 @@ const ShopPage = () => {
   const [selectedCream, setSelectedCream] = useState([]);
   const [selectedWeight, setSelectedWeight] = useState([]);
 
-  /* ACCORDION */
   const [openSection, setOpenSection] = useState(null);
 
   const toggleSection = (section) =>
@@ -51,6 +48,7 @@ const ShopPage = () => {
   };
 
   /* FETCH DATA */
+
   useEffect(() => {
 
     const fetchData = async () => {
@@ -81,48 +79,73 @@ const ShopPage = () => {
   }, []);
 
   /* FILTER ENGINE */
+
   const filteredProducts = useMemo(() => {
 
     let result = products;
 
     /* CATEGORY FILTER */
+
     if (categoryQuery) {
       const cat = categories.find(c => c.slug === categoryQuery);
-      if (cat) result = result.filter(p => p.categoryId === cat._id);
+
+      if (cat) {
+        result = result.filter(
+          p => String(p.categoryId) === String(cat._id) || p.categoryId === cat.slug
+        );
+      }
     }
 
     /* COLLECTION FILTER */
+
     if (collectionQuery) {
       const col = collections.find(c => c.slug === collectionQuery);
-      if (col) result = result.filter(p => p.collectionId === col._id);
+
+      if (col) {
+        result = result.filter(
+          p => String(p.collectionId) === String(col._id) || p.collectionId === col.slug
+        );
+      }
     }
 
     /* OCCASION FILTER */
+
     if (occasionQuery) {
       const occ = occasions.find(o => o.slug === occasionQuery);
-      if (occ) result = result.filter(p => p.occasionId === occ._id);
+
+      if (occ) {
+        result = result.filter(
+          p => String(p.occasionId) === String(occ._id) || p.occasionId === occ.slug
+        );
+      }
     }
 
     /* FLAVOUR FILTER */
+
     if (selectedFlavours.length)
       result = result.filter(p => selectedFlavours.includes(p.flavour));
 
     /* DIET FILTER */
+
     if (selectedDiet.length)
       result = result.filter(p => selectedDiet.includes(p.diet));
 
     /* CREAM FILTER */
+
     if (selectedCream.length)
       result = result.filter(p => selectedCream.includes(p.cream));
 
     /* WEIGHT FILTER */
+
     if (selectedWeight.length)
       result = result.filter(p => selectedWeight.includes(p.weight));
 
     /* PRICE FILTER */
+
     result = result.filter(p => p.price <= maxPrice);
 
-    /* SORTING */
+    /* SORT */
+
     if (sort === "low")
       result = [...result].sort((a,b)=>a.price-b.price);
 
@@ -148,6 +171,7 @@ const ShopPage = () => {
   ]);
 
   /* PAGE TITLE */
+
   let pageTitle = "All Cakes";
 
   if (categoryQuery) {
@@ -165,7 +189,8 @@ const ShopPage = () => {
     if (occ) pageTitle = occ.name;
   }
 
-  /* LOADING SCREEN */
+  /* LOADING */
+
   if (loading) {
     return (
       <>
@@ -186,6 +211,7 @@ const ShopPage = () => {
         <div className="shop-container">
 
           {/* SIDEBAR */}
+
           <aside className="sidebar">
 
             <h3>Filters</h3>
@@ -211,56 +237,6 @@ const ShopPage = () => {
                 onChange={e=>setMaxPrice(e.target.value)}
               />
             </div>
-
-            {/* FILTER ACCORDIONS */}
-
-            {[
-
-              {title:"Flavours",list:flavoursList,state:selectedFlavours,set:setSelectedFlavours,key:"flavour"},
-
-              {title:"Dietary Preference",list:dietList,state:selectedDiet,set:setSelectedDiet,key:"diet"},
-
-              {title:"Cream Type",list:creamList,state:selectedCream,set:setSelectedCream,key:"cream"},
-
-              {title:"Weight",list:weightList,state:selectedWeight,set:setSelectedWeight,key:"weight"}
-
-            ].map(section => (
-
-              <div
-                key={section.key}
-                className={`filter-group accordion ${openSection===section.key ? "open" : ""}`}
-              >
-
-                <div
-                  className="accordion-header"
-                  onClick={()=>toggleSection(section.key)}
-                >
-                  <label>{section.title}</label>
-                  <span>+</span>
-                </div>
-
-                <div className="accordion-body">
-
-                  {section.list.map(item => (
-
-                    <div key={item} className="checkbox">
-
-                      <input
-                        type="checkbox"
-                        onChange={()=>toggleFilter(item, section.state, section.set)}
-                      />
-
-                      <span>{item}</span>
-
-                    </div>
-
-                  ))}
-
-                </div>
-
-              </div>
-
-            ))}
 
             <button
               className="clear-btn"

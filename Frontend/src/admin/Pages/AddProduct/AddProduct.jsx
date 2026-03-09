@@ -6,10 +6,8 @@ const AddProduct = () => {
 
   const [imageFile,setImageFile] = useState(null);
 
-  /* CMS DATA */
   const [categories,setCategories] = useState([]);
   const [collections,setCollections] = useState([]);
-  const [filteredCollections,setFilteredCollections] = useState([]);
   const [occasions,setOccasions] = useState([]);
   const [tags,setTags] = useState([]);
 
@@ -26,30 +24,30 @@ const AddProduct = () => {
     tags:[]
   });
 
-  /* FETCH CMS DATA */
+  /* Fetch CMS Data */
   useEffect(()=>{
-    axios.get("http://localhost:5000/api/meta/category").then(res=>setCategories(res.data));
-    axios.get("http://localhost:5000/api/meta/collection").then(res=>setCollections(res.data));
-    axios.get("http://localhost:5000/api/meta/occasion").then(res=>setOccasions(res.data));
-    axios.get("http://localhost:5000/api/meta/tag").then(res=>setTags(res.data));
-  },[]);
+    axios.get("http://localhost:5000/api/meta/category")
+      .then(res=>setCategories(res.data));
 
-  /* FILTER COLLECTION WHEN CATEGORY CHANGES */
-  useEffect(()=>{
-    const filtered = collections.filter(c=>c.categorySlug === form.categoryId);
-    setFilteredCollections(filtered);
-  },[form.categoryId, collections]);
+    axios.get("http://localhost:5000/api/meta/collection")
+      .then(res=>setCollections(res.data));
+
+    axios.get("http://localhost:5000/api/meta/occasion")
+      .then(res=>setOccasions(res.data));
+
+    axios.get("http://localhost:5000/api/meta/tag")
+      .then(res=>setTags(res.data));
+  },[]);
 
   const handleChange = (e)=>{
     setForm({...form,[e.target.name]:e.target.value});
   };
 
-  /* MULTI TAG SELECT */
   const toggleTag = (slug)=>{
     if(form.tags.includes(slug)){
-      setForm({...form, tags: form.tags.filter(t=>t!==slug)});
-    } else {
-      setForm({...form, tags:[...form.tags, slug]});
+      setForm({...form,tags:form.tags.filter(t=>t!==slug)});
+    }else{
+      setForm({...form,tags:[...form.tags,slug]});
     }
   };
 
@@ -57,6 +55,7 @@ const AddProduct = () => {
     e.preventDefault();
 
     try{
+
       const formData = new FormData();
 
       Object.keys(form).forEach(key=>{
@@ -65,80 +64,133 @@ const AddProduct = () => {
         }
       });
 
-      formData.append("tags", form.tags.join(","));
-      formData.append("image", imageFile);
+      formData.append("tags",form.tags.join(","));
+      formData.append("image",imageFile);
 
       await axios.post(
         "http://localhost:5000/api/product/add",
         formData,
-        { headers:{ "Content-Type":"multipart/form-data" } }
+        {headers:{"Content-Type":"multipart/form-data"}}
       );
 
       alert("🎉 Product Added Successfully");
 
     }catch(err){
-      alert("Error adding product");
       console.log(err);
+      alert("Error adding product");
     }
   };
 
   return (
-    <div>
+    <div className="admin-page">
+
       <h1>Add New Cake 🎂</h1>
 
       <form className="admin-form" onSubmit={handleSubmit}>
 
-        <input name="name" placeholder="Cake Name" onChange={handleChange}/>
-        <input name="price" placeholder="Price" onChange={handleChange}/>
+        {/* BASIC INFO */}
+        <h3>Basic Information</h3>
 
-        {/* CATEGORY DROPDOWN */}
-        <select name="categoryId" onChange={handleChange}>
-          <option>Select Category</option>
+        <input
+          name="name"
+          placeholder="Cake Name"
+          onChange={handleChange}
+          required
+        />
+
+        <input
+          name="price"
+          placeholder="Price"
+          onChange={handleChange}
+          required
+        />
+
+        {/* WHERE CAKE APPEARS */}
+        <h3>Where should this cake appear?</h3>
+
+        <select name="categoryId" onChange={handleChange} required>
+          <option value="">Select Category</option>
           {categories.map(c=>(
-            <option key={c._id} value={c.slug}>{c.name}</option>
+            <option key={c._id} value={c._id}>
+              {c.name}
+            </option>
           ))}
         </select>
 
-        {/* COLLECTION DROPDOWN */}
         <select name="collectionId" onChange={handleChange}>
-          <option>Select Collection</option>
-          {filteredCollections.map(c=>(
-            <option key={c._id} value={c.slug}>{c.name}</option>
+          <option value="">Select Collection (optional)</option>
+          {collections.map(c=>(
+            <option key={c._id} value={c._id}>
+              {c.name}
+            </option>
           ))}
         </select>
 
-        {/* OCCASION DROPDOWN */}
         <select name="occasionId" onChange={handleChange}>
-          <option>Select Occasion</option>
+          <option value="">Select Occasion (optional)</option>
           {occasions.map(o=>(
-            <option key={o._id} value={o.slug}>{o.name}</option>
+            <option key={o._id} value={o._id}>
+              {o.name}
+            </option>
           ))}
         </select>
 
-        <input name="flavour" placeholder="Flavour" onChange={handleChange}/>
+        {/* CAKE DETAILS */}
+        <h3>Cake Details</h3>
+
+        <input
+          name="flavour"
+          placeholder="Flavour (Chocolate, Vanilla...)"
+          onChange={handleChange}
+        />
 
         <select name="diet" onChange={handleChange}>
           <option value="egg">Egg</option>
           <option value="eggless">Eggless</option>
         </select>
 
-        <input name="cream" placeholder="Cream" onChange={handleChange}/>
-        <input name="weight" placeholder="Weight" onChange={handleChange}/>
+        <input
+          name="cream"
+          placeholder="Cream Type"
+          onChange={handleChange}
+        />
 
-        {/* TAGS MULTI SELECT */}
+        <input
+          name="weight"
+          placeholder="Weight (500g, 1kg...)"
+          onChange={handleChange}
+        />
+
+        {/* TAGS */}
+        <h3>Tags</h3>
+
         <div className="tags-box">
           {tags.map(tag=>(
             <label key={tag._id}>
-              <input type="checkbox" onChange={()=>toggleTag(tag.slug)} />
+              <input
+                type="checkbox"
+                onChange={()=>toggleTag(tag.slug)}
+              />
               {tag.name}
             </label>
           ))}
         </div>
 
-        <input type="file" onChange={(e)=>setImageFile(e.target.files[0])} />
+        {/* IMAGE */}
+        <h3>Upload Image</h3>
 
-        <button>Add Product</button>
+        <input
+          type="file"
+          onChange={(e)=>setImageFile(e.target.files[0])}
+          required
+        />
+
+        <button type="submit">
+          Add Cake
+        </button>
+
       </form>
+
     </div>
   );
 };

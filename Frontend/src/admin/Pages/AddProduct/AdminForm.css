@@ -1,21 +1,52 @@
 .admin-form{
   display:flex;
   flex-direction:column;
-  gap:15px;
-  max-width:400px;
+  gap:16px;
+  max-width:420px;
+  width:100%;
+  padding:24px;
+  background:#ffffff;
+  border-radius:12px;
+  box-shadow:0 6px 20px rgba(0,0,0,0.08);
 }
 
-.admin-form input{
-  padding:10px;
+/* INPUTS */
+
+.admin-form input,
+.admin-form select{
+  padding:12px;
   border-radius:8px;
-  border:1px solid #ccc;
+  border:1px solid #ddd;
+  font-size:14px;
+  outline:none;
+  transition:0.25s;
 }
+
+/* INPUT FOCUS */
+
+.admin-form input:focus,
+.admin-form select:focus{
+  border-color:rgb(230,90,120);
+  box-shadow:0 0 0 2px rgba(230,90,120,0.15);
+}
+
+/* BUTTON */
 
 .admin-form button{
-  background:#ff5c8a;
+  background:rgb(230,90,120);
   color:white;
   border:none;
-  padding:10px;
+  padding:12px;
   border-radius:8px;
   cursor:pointer;
+  font-weight:600;
+  transition:0.25s;
+}
+
+/* BUTTON HOVER */
+
+.admin-form button:hover{
+  background:rgb(200,70,100);
+  transform:translateY(-1px);
+  box-shadow:0 6px 15px rgba(230,90,120,0.25);
 }

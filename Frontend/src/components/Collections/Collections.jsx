@@ -6,18 +6,28 @@ import axios from "axios";
 const Collections = () => {
 
   const navigate = useNavigate();
-  const [categories,setCategories] = useState([]);
+  const [collections,setCollections] = useState([]);
 
-  /* 🔥 Fetch categories from backend */
   useEffect(()=>{
-    axios
-      .get("http://localhost:5000/api/meta/category")
-      .then(res => setCategories(res.data))
-      .catch(err => console.log(err));
+
+    const fetchCollections = async () => {
+      try{
+        const res = await axios.get("http://localhost:5000/api/meta/collection");
+        console.log(res.data);
+
+        setCollections(res.data);
+      }catch(err){
+        console.log(err);
+      }
+    };
+
+    fetchCollections();
+
   },[]);
 
   return (
     <section className="collections">
+
       <h2>Shop Our Curated Collections Today!</h2>
 
       <p className="subtitle">
@@ -26,31 +36,44 @@ const Collections = () => {
       </p>
 
       <div className="collection-grid">
-        {categories.map((cat) => (
-          <div className="collection-card" key={cat._id}>
 
-            <img src={cat.image} alt={cat.name} />
+        {collections.length === 0 && (
+          <p>No collections found</p>
+        )}
+
+        {collections.map((col) => (
+
+          <div className="collection-card" key={col._id}>
+
+            <img
+              src={`http://localhost:5000/${col.image}`}
+              alt={col.name}
+            />
 
             <div className="collection-overlay">
-              <h3>{cat.name}</h3>
+
+              <h3>{col.name}</h3>
 
               <p>
-                Discover delicious {cat.name.toLowerCase()} crafted for your
-                special moments.
+                Discover delicious {col.name.toLowerCase()} cakes crafted for your special moments.
               </p>
 
               <button
                 onClick={() =>
-                  navigate(`/shop?category=${cat.slug}`)
+                  navigate(`/shop?collection=${col.slug}`)
                 }
               >
-                <span>Explore Now →</span>
+                Explore Now →
               </button>
 
             </div>
+
           </div>
+
         ))}
+
       </div>
+
     </section>
   );
 };

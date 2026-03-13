@@ -9,19 +9,26 @@ const AddCollections = () => {
 
   const [name,setName] = useState("");
   const [slug,setSlug] = useState("");
-  const [categorySlug,setCategorySlug] = useState("");
+  const [categoryIds,setCategoryIds] = useState([]);
   const [image,setImage] = useState(null);
+
+  const [message,setMessage] = useState("");
+  const [error,setError] = useState("");
+  const [loading,setLoading] = useState(false);
 
   const API = "http://localhost:5000/api/meta/collection";
 
   /* FETCH DATA */
+
   const fetchCollections = async ()=>{
     const res = await axios.get(API);
     setCollections(res.data);
   };
 
   const fetchCategories = async ()=>{
-    const res = await axios.get("http://localhost:5000/api/meta/category");
+    const res = await axios.get(
+      "http://localhost:5000/api/meta/category"
+    );
     setCategories(res.data);
   };
 
@@ -30,83 +37,207 @@ const AddCollections = () => {
     fetchCategories();
   },[]);
 
+  /* TOGGLE CATEGORY */
+
+  const toggleCategory = (id)=>{
+
+    if(categoryIds.includes(id)){
+      setCategoryIds(
+        categoryIds.filter(c=>c!==id)
+      );
+    }else{
+      setCategoryIds([...categoryIds,id]);
+    }
+
+  };
+
   /* ADD COLLECTION */
+
   const handleSubmit = async (e)=>{
     e.preventDefault();
 
-    const formData = new FormData();
-    formData.append("name", name);
-    formData.append("slug", slug);
-    formData.append("categorySlug", categorySlug);
-    formData.append("image", image);
+    setMessage("");
+    setError("");
+    setLoading(true);
 
-    await axios.post(API, formData, {
-      headers:{ "Content-Type":"multipart/form-data" }
-    });
+    try{
 
-    setName("");
-    setSlug("");
-    setCategorySlug("");
-    setImage(null);
-    fetchCollections();
+      const formData = new FormData();
+
+      formData.append("name",name);
+      formData.append("slug",slug);
+
+      formData.append(
+        "categoryIds",
+        categoryIds.join(",")
+      );
+
+      formData.append("image",image);
+
+      await axios.post(API,formData,{
+        headers:{
+          "Content-Type":"multipart/form-data"
+        }
+      });
+
+      setMessage("✅ Collection added successfully");
+
+      setName("");
+      setSlug("");
+      setCategoryIds([]);
+      setImage(null);
+
+      fetchCollections();
+
+    }catch(err){
+
+      setError(
+        err.response?.data?.message ||
+        "❌ Failed to add collection"
+      );
+
+    }
+
+    setLoading(false);
   };
 
   /* DELETE */
+
   const deleteCollection = async(id)=>{
+
+    if(!window.confirm("Delete this collection?")) return;
+
     await axios.delete(`${API}/${id}`);
+
+    setMessage("🗑 Collection deleted");
+
     fetchCollections();
+
   };
 
   return (
+
     <div className="admin-page">
+
       <h1>Collections</h1>
 
+      {/* SUCCESS MESSAGE */}
+
+      {message && (
+        <div className="success-msg">
+          {message}
+        </div>
+      )}
+
+      {/* ERROR MESSAGE */}
+
+      {error && (
+        <div className="error-msg">
+          {error}
+        </div>
+      )}
+
       {/* ADD FORM */}
-      <form onSubmit={handleSubmit} className="admin-form">
+
+      <form
+        onSubmit={handleSubmit}
+        className="admin-form"
+      >
 
         <input
           placeholder="Collection Name"
           value={name}
           onChange={(e)=>setName(e.target.value)}
+          required
         />
 
         <input
           placeholder="Slug (pinata)"
           value={slug}
           onChange={(e)=>setSlug(e.target.value)}
+          required
         />
 
-        {/* CATEGORY DROPDOWN */}
-        <select
-          value={categorySlug}
-          onChange={(e)=>setCategorySlug(e.target.value)}
-        >
-          <option>Select Category</option>
+        {/* CATEGORY CHECKBOXES */}
+
+        <div className="category-box">
+
+          <p>Select Categories</p>
+
           {categories.map(cat=>(
-            <option key={cat._id} value={cat.slug}>
+
+            <label key={cat._id}>
+
+              <input
+                type="checkbox"
+                checked={categoryIds.includes(cat._id)}
+                onChange={()=>toggleCategory(cat._id)}
+              />
+
               {cat.name}
-            </option>
+
+            </label>
+
           ))}
-        </select>
 
-        <input type="file" onChange={(e)=>setImage(e.target.files[0])} />
+        </div>
 
-        <button>Add Collection</button>
+        <input
+          type="file"
+          onChange={(e)=>setImage(e.target.files[0])}
+          required
+        />
+
+        <button disabled={loading}>
+          {loading ? "Adding..." : "Add Collection"}
+        </button>
+
       </form>
 
       {/* LIST */}
+
       <div className="grid">
+
         {collections.map(col=>(
-          <div key={col._id} className="card">
-            <img src={col.image} alt="" />
+
+          <div
+            key={col._id}
+            className="card"
+          >
+
+            <img
+              src={`http://localhost:5000/${col.image}`}
+              alt=""
+            />
+
             <h3>{col.name}</h3>
-            <p>Category: {col.categorySlug}</p>
-            <button onClick={()=>deleteCollection(col._id)}>Delete</button>
+
+            <p>
+              Categories:
+              {col.categoryIds?.map(id=>{
+                const cat = categories.find(
+                  c=>c._id===id
+                );
+                return cat?.name;
+              }).join(", ")}
+            </p>
+
+            <button
+              onClick={()=>deleteCollection(col._id)}
+            >
+              Delete
+            </button>
+
           </div>
+
         ))}
+
       </div>
+
     </div>
+
   );
+
 };
 
 export default AddCollections;

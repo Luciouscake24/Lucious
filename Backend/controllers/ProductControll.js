@@ -1,4 +1,3 @@
-
 import Product from "../models/ProductModel.js";
 import XLSX from "xlsx";
 
@@ -13,6 +12,7 @@ export const addProduct = async (req,res)=>{
 
     const product = new Product({
       ...req.body,
+      bestseller: req.body.bestseller === "true",   // ⭐ added
       tags: req.body.tags?.split(","),
       image: req.file.path
     });
@@ -41,6 +41,26 @@ export const getProducts = async (req,res)=>{
   try{
 
     const products = await Product.find().sort({createdAt:-1});
+
+    res.json(products);
+
+  }
+  catch(err){
+    console.log(err);
+    res.status(500).json({message:err.message});
+  }
+};
+
+
+/* ================= ⭐ GET BESTSELLER PRODUCTS ================= */
+
+export const getBestSellers = async (req,res)=>{
+  try{
+
+    const products = await Product
+      .find({ bestseller:true })
+      .limit(6)
+      .sort({createdAt:-1});
 
     res.json(products);
 
@@ -120,6 +140,7 @@ export const importProducts = async (req,res)=>{
         diet: row.diet,
         cream: row.cream,
         weight: row.weight,
+        bestseller: row.bestseller === "true",  // ⭐ added
         tags: row.tags ? row.tags.split(",") : []
       });
 

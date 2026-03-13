@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import axios from "axios";
 import "./AdminForm.css";
@@ -24,7 +23,8 @@ const AddProduct = () => {
     diet:"egg",
     cream:"",
     weight:"1kg",
-    tags:[]
+    tags:[],
+    bestseller:false   // ⭐ NEW FIELD
   });
 
   /* ================= FETCH CMS DATA ================= */
@@ -86,6 +86,22 @@ const AddProduct = () => {
       );
 
       alert("🎉 Product Added Successfully");
+
+      setForm({
+        name:"",
+        price:"",
+        categoryId:"",
+        collectionId:"",
+        occasionId:"",
+        flavour:"",
+        diet:"egg",
+        cream:"",
+        weight:"1kg",
+        tags:[],
+        bestseller:false
+      });
+
+      setImageFile(null);
 
     }catch(err){
       console.log(err);
@@ -156,7 +172,8 @@ const AddProduct = () => {
       "cream",
       "weight",
       "tags",
-      "imageUrl"
+      "imageUrl",
+      "bestseller"
     ];
 
     const csvContent = "data:text/csv;charset=utf-8," + headers.join(",");
@@ -177,13 +194,11 @@ const AddProduct = () => {
 
       <h1>Add New Cake 🎂</h1>
 
-      {/* DOWNLOAD TEMPLATE */}
-
       <button onClick={downloadTemplate}>
         📥 Download Excel Template
       </button>
 
-      {/* DRAG DROP AREA */}
+      {/* DRAG DROP */}
 
       <div
         onDrop={handleDrop}
@@ -198,22 +213,15 @@ const AddProduct = () => {
         Drag & Drop Excel File Here
       </div>
 
-      {/* FILE INPUT */}
-
       <input
         type="file"
         accept=".xlsx,.xls,.csv"
         onChange={(e)=>setExcelFile(e.target.files[0])}
       />
 
-      <button
-        type="button"
-        onClick={handleExcelUpload}
-      >
+      <button type="button" onClick={handleExcelUpload}>
         Import Excel
       </button>
-
-      {/* PROGRESS BAR */}
 
       {progress>0 && (
         <div style={{marginTop:"10px"}}>
@@ -239,6 +247,7 @@ const AddProduct = () => {
         <input
           name="name"
           placeholder="Cake Name"
+          value={form.name}
           onChange={handleChange}
           required
         />
@@ -246,13 +255,14 @@ const AddProduct = () => {
         <input
           name="price"
           placeholder="Price"
+          value={form.price}
           onChange={handleChange}
           required
         />
 
         <h3>Where should this cake appear?</h3>
 
-        <select name="categoryId" onChange={handleChange} required>
+        <select name="categoryId" value={form.categoryId} onChange={handleChange} required>
           <option value="">Select Category</option>
           {categories.map(c=>(
             <option key={c._id} value={c._id}>
@@ -261,7 +271,7 @@ const AddProduct = () => {
           ))}
         </select>
 
-        <select name="collectionId" onChange={handleChange}>
+        <select name="collectionId" value={form.collectionId} onChange={handleChange}>
           <option value="">Select Collection</option>
           {collections.map(c=>(
             <option key={c._id} value={c._id}>
@@ -270,7 +280,7 @@ const AddProduct = () => {
           ))}
         </select>
 
-        <select name="occasionId" onChange={handleChange}>
+        <select name="occasionId" value={form.occasionId} onChange={handleChange}>
           <option value="">Select Occasion</option>
           {occasions.map(o=>(
             <option key={o._id} value={o._id}>
@@ -284,10 +294,11 @@ const AddProduct = () => {
         <input
           name="flavour"
           placeholder="Flavour"
+          value={form.flavour}
           onChange={handleChange}
         />
 
-        <select name="diet" onChange={handleChange}>
+        <select name="diet" value={form.diet} onChange={handleChange}>
           <option value="egg">Egg</option>
           <option value="eggless">Eggless</option>
         </select>
@@ -295,14 +306,29 @@ const AddProduct = () => {
         <input
           name="cream"
           placeholder="Cream"
+          value={form.cream}
           onChange={handleChange}
         />
 
         <input
           name="weight"
           placeholder="Weight"
+          value={form.weight}
           onChange={handleChange}
         />
+
+        {/* ⭐ BESTSELLER */}
+
+        <label style={{marginTop:"10px"}}>
+          <input
+            type="checkbox"
+            checked={form.bestseller}
+            onChange={(e)=>
+              setForm({...form,bestseller:e.target.checked})
+            }
+          />
+          Mark as Bestseller ⭐
+        </label>
 
         <h3>Tags</h3>
 

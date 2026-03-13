@@ -1,11 +1,11 @@
-
 import express from "express";
 import {
   addProduct,
   getProducts,
   deleteProduct,
   getSingleProduct,
-  importProducts
+  importProducts,
+  getBestSellers
 } from "../controllers/ProductControll.js";
 
 import { upload } from "../middleware/upload.js";
@@ -20,6 +20,9 @@ router.post("/import", upload.single("file"), importProducts);
 
 /* GET ALL PRODUCTS */
 router.get("/list", getProducts);
+
+/* ⭐ GET BESTSELLER PRODUCTS */
+router.get("/bestsellers", getBestSellers);
 
 /* GET SINGLE PRODUCT */
 router.get("/single/:id", getSingleProduct);

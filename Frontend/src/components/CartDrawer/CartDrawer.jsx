@@ -3,65 +3,148 @@ import { StoreContext } from "../../context/StoreContext";
 import "./CartDrawer.css";
 
 const CartDrawer = ({ open, setOpen }) => {
-  const store = useContext(StoreContext) || {};
-  const state = store.state || { cart: [] };
-  const dispatch = store.dispatch || (() => {});
 
-  const cart = state.cart || [];
+  const { state, dispatch } = useContext(StoreContext);
+  const cart = state?.cart || [];
 
-  const totalItems = cart.reduce((acc, item) => acc + item.quantity, 0);
-  const totalPrice = cart.reduce(
-    (acc, item) => acc + item.price * item.quantity,
-    0
+  const totalItems = cart.reduce(
+    (a,b)=>a+b.quantity,0
   );
 
+  const totalPrice = cart.reduce(
+    (a,b)=>a+b.price*b.quantity,0
+  );
+
+  const increase = (id)=>{
+    dispatch({type:"INCREASE_QTY",payload:id});
+  };
+
+  const decrease = (id)=>{
+    dispatch({type:"DECREASE_QTY",payload:id});
+  };
+
+  const remove = (id)=>{
+    dispatch({type:"REMOVE_FROM_CART",payload:id});
+  };
+
   return (
+
     <div
-      className={`drawer-overlay ${open ? "show" : ""}`}
-      onClick={() => setOpen(false)}
+      className={`drawer-overlay ${open?"show":""}`}
+      onClick={()=>setOpen(false)}
     >
-      <div className="drawer" onClick={(e) => e.stopPropagation()}>
-        
+
+      <div
+        className={`drawer ${open?"open":""}`}
+        onClick={(e)=>e.stopPropagation()}
+      >
+
         {/* HEADER */}
+
         <div className="drawer-header">
+
           <h2>Cart ({totalItems})</h2>
-          <span className="close-btn" onClick={() => setOpen(false)}>✕</span>
+
+          <button
+            className="close-btn"
+            onClick={()=>setOpen(false)}
+          >
+            ✕
+          </button>
+
         </div>
 
         {/* ITEMS */}
+
         <div className="drawer-items">
-          {cart.length === 0 ? (
-            <p className="empty-cart">Your cart is empty 😢</p>
-          ) : (
-            cart.map(item => (
-              <div key={item.id} className="drawer-item">
-                <img src={item.img} alt="" />
 
-                <div className="item-info">
-                  <h4>{item.name}</h4>
-                  <p>₹{item.price}</p>
-
-                  <div className="qty-box">
-                    <button onClick={() => dispatch({ type:"DECREASE_QTY", payload:item.id })}>−</button>
-                    <span>{item.quantity}</span>
-                    <button onClick={() => dispatch({ type:"INCREASE_QTY", payload:item.id })}>+</button>
-                  </div>
-                </div>
-              </div>
-            ))
+          {cart.length===0 && (
+            <p className="empty-cart">
+              Your cart is empty 🛒
+            </p>
           )}
+
+          {cart.map(item=>(
+
+            <div
+              key={item._id}
+              className="drawer-item"
+            >
+
+              <img
+                src={`http://localhost:5000/${item.image}`}
+                alt={item.name}
+                onError={(e)=>{
+                  e.target.src="/cake-placeholder.jpg";
+                }}
+              />
+
+              <div className="item-info">
+
+                <h4>{item.name}</h4>
+
+                <p className="price">
+                  ₹{item.price}
+                </p>
+
+                <div className="qty-box">
+
+                  <button
+                    onClick={()=>decrease(item._id)}
+                  >
+                    −
+                  </button>
+
+                  <span>{item.quantity}</span>
+
+                  <button
+                    onClick={()=>increase(item._id)}
+                  >
+                    +
+                  </button>
+
+                </div>
+
+              </div>
+
+              <button
+                className="remove-btn"
+                onClick={()=>remove(item._id)}
+              >
+                🗑
+              </button>
+
+            </div>
+
+          ))}
+
         </div>
 
         {/* FOOTER */}
-        {cart.length > 0 && (
+
+        {cart.length>0 && (
+
           <div className="drawer-footer">
-            <h3>Total: ₹{totalPrice}</h3>
-            <button className="checkout-btn">Checkout</button>
+
+            <div className="total">
+              <span>Total</span>
+              <strong>₹{totalPrice}</strong>
+            </div>
+
+            <button className="checkout-btn">
+              Checkout
+            </button>
+
           </div>
+
         )}
+
       </div>
+
     </div>
+
   );
+
 };
 
 export default CartDrawer;

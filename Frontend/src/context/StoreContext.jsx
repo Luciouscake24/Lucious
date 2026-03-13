@@ -1,3 +1,4 @@
+
 import React, { createContext, useReducer, useEffect } from "react";
 
 export const StoreContext = createContext();
@@ -15,15 +16,22 @@ const initialState = {
 };
 
 function reducer(state, action) {
+
   switch (action.type) {
+
+    /* ADD PRODUCT */
+
     case "ADD_TO_CART": {
-      const exist = state.cart.find(i => i.id === action.payload.id);
+
+      const exist = state.cart.find(
+        i => i._id === action.payload._id
+      );
 
       if (exist) {
         return {
           ...state,
           cart: state.cart.map(i =>
-            i.id === action.payload.id
+            i._id === action.payload._id
               ? { ...i, quantity: i.quantity + 1 }
               : i
           )
@@ -32,36 +40,47 @@ function reducer(state, action) {
 
       return {
         ...state,
-        cart: [...state.cart, action.payload]
+        cart: [
+          ...state.cart,
+          { ...action.payload, quantity: 1 }
+        ]
       };
     }
+
+    /* INCREASE */
 
     case "INCREASE_QTY":
       return {
         ...state,
         cart: state.cart.map(i =>
-          i.id === action.payload
+          i._id === action.payload
             ? { ...i, quantity: i.quantity + 1 }
             : i
         )
       };
+
+    /* DECREASE */
 
     case "DECREASE_QTY":
       return {
         ...state,
         cart: state.cart
           .map(i =>
-            i.id === action.payload
+            i._id === action.payload
               ? { ...i, quantity: i.quantity - 1 }
               : i
           )
           .filter(i => i.quantity > 0)
       };
 
+    /* REMOVE */
+
     case "REMOVE_FROM_CART":
       return {
         ...state,
-        cart: state.cart.filter(i => i.id !== action.payload)
+        cart: state.cart.filter(
+          i => i._id !== action.payload
+        )
       };
 
     default:
@@ -70,10 +89,17 @@ function reducer(state, action) {
 }
 
 export const StoreProvider = ({ children }) => {
-  const [state, dispatch] = useReducer(reducer, initialState);
+
+  const [state, dispatch] = useReducer(
+    reducer,
+    initialState
+  );
 
   useEffect(() => {
-    localStorage.setItem("cart", JSON.stringify(state.cart));
+    localStorage.setItem(
+      "cart",
+      JSON.stringify(state.cart)
+    );
   }, [state.cart]);
 
   return (
@@ -81,4 +107,6 @@ export const StoreProvider = ({ children }) => {
       {children}
     </StoreContext.Provider>
   );
+
 };
+

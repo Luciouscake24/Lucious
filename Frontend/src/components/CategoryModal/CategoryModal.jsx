@@ -1,4 +1,3 @@
-
 import "./CategoryModal.css";
 import { X, ShoppingCart, ArrowLeft } from "lucide-react";
 import { useContext, useState, useEffect } from "react";
@@ -17,7 +16,7 @@ const CategoryModal = ({ category, closeModal }) => {
   const [sort, setSort] = useState("default");
   const [qty, setQty] = useState({});
 
-  /* ================= BODY SCROLL LOCK ================= */
+  /* BODY SCROLL LOCK */
 
   useEffect(() => {
     document.body.style.overflow = "hidden";
@@ -26,7 +25,7 @@ const CategoryModal = ({ category, closeModal }) => {
     };
   }, []);
 
-  /* ================= FETCH COLLECTIONS + PRODUCTS ================= */
+  /* FETCH COLLECTIONS + PRODUCTS */
 
   useEffect(() => {
 
@@ -48,15 +47,16 @@ const CategoryModal = ({ category, closeModal }) => {
 
   if (!category) return null;
 
-  /* ================= FILTER COLLECTIONS BY CATEGORY ================= */
+  /* FILTER COLLECTIONS BY CATEGORY */
 
   const categoryCollections = collections.filter(
     col =>
-      col.categoryId === category._id ||
-      col.categorySlug === category.slug
+      col.categoryIds?.some(
+        id => id.toString() === category._id
+      )
   );
 
-  /* ================= FILTER PRODUCTS BY COLLECTION ================= */
+  /* FILTER PRODUCTS BY COLLECTION */
 
   let collectionProducts = [];
 
@@ -86,7 +86,7 @@ const CategoryModal = ({ category, closeModal }) => {
 
   }
 
-  /* ================= CART FUNCTIONS ================= */
+  /* CART FUNCTIONS */
 
   const handleAddFirstTime = (cake) => {
 
@@ -136,7 +136,7 @@ const CategoryModal = ({ category, closeModal }) => {
         onClick={(e) => e.stopPropagation()}
       >
 
-        {/* ================= HEADER ================= */}
+        {/* HEADER */}
 
         <div className="modal-header">
 
@@ -160,7 +160,7 @@ const CategoryModal = ({ category, closeModal }) => {
 
         </div>
 
-        {/* ================= COLLECTION VIEW ================= */}
+        {/* COLLECTION VIEW */}
 
         {!selectedCollection && (
 
@@ -197,7 +197,7 @@ const CategoryModal = ({ category, closeModal }) => {
 
         )}
 
-        {/* ================= PRODUCTS VIEW ================= */}
+        {/* PRODUCTS VIEW */}
 
         {selectedCollection && (
 

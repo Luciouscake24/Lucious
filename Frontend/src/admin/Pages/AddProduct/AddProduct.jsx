@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import axios from "axios";
 import "./AdminForm.css";
@@ -5,6 +6,8 @@ import "./AdminForm.css";
 const AddProduct = () => {
 
   const [imageFile,setImageFile] = useState(null);
+  const [excelFile,setExcelFile] = useState(null);
+  const [progress,setProgress] = useState(0);
 
   const [categories,setCategories] = useState([]);
   const [collections,setCollections] = useState([]);
@@ -24,8 +27,10 @@ const AddProduct = () => {
     tags:[]
   });
 
-  /* Fetch CMS Data */
+  /* ================= FETCH CMS DATA ================= */
+
   useEffect(()=>{
+
     axios.get("http://localhost:5000/api/meta/category")
       .then(res=>setCategories(res.data));
 
@@ -37,11 +42,16 @@ const AddProduct = () => {
 
     axios.get("http://localhost:5000/api/meta/tag")
       .then(res=>setTags(res.data));
+
   },[]);
+
+  /* ================= FORM CHANGE ================= */
 
   const handleChange = (e)=>{
     setForm({...form,[e.target.name]:e.target.value});
   };
+
+  /* ================= TAG TOGGLE ================= */
 
   const toggleTag = (slug)=>{
     if(form.tags.includes(slug)){
@@ -50,6 +60,8 @@ const AddProduct = () => {
       setForm({...form,tags:[...form.tags,slug]});
     }
   };
+
+  /* ================= ADD PRODUCT ================= */
 
   const handleSubmit = async (e)=>{
     e.preventDefault();
@@ -81,14 +93,147 @@ const AddProduct = () => {
     }
   };
 
+  /* ================= IMPORT EXCEL ================= */
+
+  const handleExcelUpload = async ()=>{
+
+    if(!excelFile){
+      alert("Please select Excel file");
+      return;
+    }
+
+    try{
+
+      const formData = new FormData();
+      formData.append("file",excelFile);
+
+      await axios.post(
+        "http://localhost:5000/api/product/import",
+        formData,
+        {
+          headers:{"Content-Type":"multipart/form-data"},
+          onUploadProgress:(progressEvent)=>{
+            const percent = Math.round(
+              (progressEvent.loaded * 100) / progressEvent.total
+            );
+            setProgress(percent);
+          }
+        }
+      );
+
+      alert("🎉 Products Imported Successfully");
+      setProgress(0);
+
+    }catch(err){
+      console.log(err);
+      alert("Excel import failed");
+    }
+  };
+
+  /* ================= DRAG DROP ================= */
+
+  const handleDrop = (e)=>{
+    e.preventDefault();
+    setExcelFile(e.dataTransfer.files[0]);
+  };
+
+  const handleDragOver = (e)=>{
+    e.preventDefault();
+  };
+
+  /* ================= DOWNLOAD TEMPLATE ================= */
+
+  const downloadTemplate = ()=>{
+
+    const headers = [
+      "name",
+      "price",
+      "category",
+      "collection",
+      "occasion",
+      "flavour",
+      "diet",
+      "cream",
+      "weight",
+      "tags",
+      "imageUrl"
+    ];
+
+    const csvContent = "data:text/csv;charset=utf-8," + headers.join(",");
+
+    const encodedUri = encodeURI(csvContent);
+
+    const link = document.createElement("a");
+
+    link.setAttribute("href",encodedUri);
+    link.setAttribute("download","product_template.csv");
+
+    document.body.appendChild(link);
+    link.click();
+  };
+
   return (
     <div className="admin-page">
 
       <h1>Add New Cake 🎂</h1>
 
+      {/* DOWNLOAD TEMPLATE */}
+
+      <button onClick={downloadTemplate}>
+        📥 Download Excel Template
+      </button>
+
+      {/* DRAG DROP AREA */}
+
+      <div
+        onDrop={handleDrop}
+        onDragOver={handleDragOver}
+        style={{
+          border:"2px dashed #aaa",
+          padding:"30px",
+          marginTop:"20px",
+          textAlign:"center"
+        }}
+      >
+        Drag & Drop Excel File Here
+      </div>
+
+      {/* FILE INPUT */}
+
+      <input
+        type="file"
+        accept=".xlsx,.xls,.csv"
+        onChange={(e)=>setExcelFile(e.target.files[0])}
+      />
+
+      <button
+        type="button"
+        onClick={handleExcelUpload}
+      >
+        Import Excel
+      </button>
+
+      {/* PROGRESS BAR */}
+
+      {progress>0 && (
+        <div style={{marginTop:"10px"}}>
+          <div
+            style={{
+              height:"10px",
+              width:progress+"%",
+              background:"green"
+            }}
+          ></div>
+          {progress}%
+        </div>
+      )}
+
+      <hr/>
+
+      {/* PRODUCT FORM */}
+
       <form className="admin-form" onSubmit={handleSubmit}>
 
-        {/* BASIC INFO */}
         <h3>Basic Information</h3>
 
         <input
@@ -105,7 +250,6 @@ const AddProduct = () => {
           required
         />
 
-        {/* WHERE CAKE APPEARS */}
         <h3>Where should this cake appear?</h3>
 
         <select name="categoryId" onChange={handleChange} required>
@@ -118,7 +262,7 @@ const AddProduct = () => {
         </select>
 
         <select name="collectionId" onChange={handleChange}>
-          <option value="">Select Collection (optional)</option>
+          <option value="">Select Collection</option>
           {collections.map(c=>(
             <option key={c._id} value={c._id}>
               {c.name}
@@ -127,7 +271,7 @@ const AddProduct = () => {
         </select>
 
         <select name="occasionId" onChange={handleChange}>
-          <option value="">Select Occasion (optional)</option>
+          <option value="">Select Occasion</option>
           {occasions.map(o=>(
             <option key={o._id} value={o._id}>
               {o.name}
@@ -135,12 +279,11 @@ const AddProduct = () => {
           ))}
         </select>
 
-        {/* CAKE DETAILS */}
         <h3>Cake Details</h3>
 
         <input
           name="flavour"
-          placeholder="Flavour (Chocolate, Vanilla...)"
+          placeholder="Flavour"
           onChange={handleChange}
         />
 
@@ -151,17 +294,16 @@ const AddProduct = () => {
 
         <input
           name="cream"
-          placeholder="Cream Type"
+          placeholder="Cream"
           onChange={handleChange}
         />
 
         <input
           name="weight"
-          placeholder="Weight (500g, 1kg...)"
+          placeholder="Weight"
           onChange={handleChange}
         />
 
-        {/* TAGS */}
         <h3>Tags</h3>
 
         <div className="tags-box">
@@ -176,7 +318,6 @@ const AddProduct = () => {
           ))}
         </div>
 
-        {/* IMAGE */}
         <h3>Upload Image</h3>
 
         <input

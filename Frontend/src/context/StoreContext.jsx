@@ -1,7 +1,8 @@
-
 import React, { createContext, useReducer, useEffect } from "react";
 
 export const StoreContext = createContext();
+
+/* LOAD CART FROM LOCAL STORAGE */
 
 const loadCart = () => {
   try {
@@ -15,25 +16,36 @@ const initialState = {
   cart: loadCart()
 };
 
+/* REDUCER */
+
 function reducer(state, action) {
 
   switch (action.type) {
 
-    /* ADD PRODUCT */
+    /* ADD PRODUCT WITH CUSTOM OPTIONS */
 
     case "ADD_TO_CART": {
 
       const exist = state.cart.find(
-        i => i._id === action.payload._id
+        item =>
+          item._id === action.payload._id &&
+          item.weight === action.payload.weight &&
+          item.flavour === action.payload.flavour &&
+          item.deliveryDate === action.payload.deliveryDate &&
+          item.deliverySlot === action.payload.deliverySlot
       );
 
       if (exist) {
         return {
           ...state,
-          cart: state.cart.map(i =>
-            i._id === action.payload._id
-              ? { ...i, quantity: i.quantity + 1 }
-              : i
+          cart: state.cart.map(item =>
+            item._id === action.payload._id &&
+            item.weight === action.payload.weight &&
+            item.flavour === action.payload.flavour &&
+            item.deliveryDate === action.payload.deliveryDate &&
+            item.deliverySlot === action.payload.deliverySlot
+              ? { ...item, quantity: item.quantity + 1 }
+              : item
           )
         };
       }
@@ -42,7 +54,10 @@ function reducer(state, action) {
         ...state,
         cart: [
           ...state.cart,
-          { ...action.payload, quantity: 1 }
+          {
+            ...action.payload,
+            quantity: 1
+          }
         ]
       };
     }
@@ -50,37 +65,38 @@ function reducer(state, action) {
     /* INCREASE */
 
     case "INCREASE_QTY":
+
       return {
         ...state,
-        cart: state.cart.map(i =>
-          i._id === action.payload
-            ? { ...i, quantity: i.quantity + 1 }
-            : i
+        cart: state.cart.map(item =>
+          item._id === action.payload
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
         )
       };
 
     /* DECREASE */
 
     case "DECREASE_QTY":
+
       return {
         ...state,
         cart: state.cart
-          .map(i =>
-            i._id === action.payload
-              ? { ...i, quantity: i.quantity - 1 }
-              : i
+          .map(item =>
+            item._id === action.payload
+              ? { ...item, quantity: item.quantity - 1 }
+              : item
           )
-          .filter(i => i.quantity > 0)
+          .filter(item => item.quantity > 0)
       };
 
     /* REMOVE */
 
     case "REMOVE_FROM_CART":
+
       return {
         ...state,
-        cart: state.cart.filter(
-          i => i._id !== action.payload
-        )
+        cart: state.cart.filter(item => item._id !== action.payload)
       };
 
     default:
@@ -88,18 +104,14 @@ function reducer(state, action) {
   }
 }
 
+/* PROVIDER */
+
 export const StoreProvider = ({ children }) => {
 
-  const [state, dispatch] = useReducer(
-    reducer,
-    initialState
-  );
+  const [state, dispatch] = useReducer(reducer, initialState);
 
   useEffect(() => {
-    localStorage.setItem(
-      "cart",
-      JSON.stringify(state.cart)
-    );
+    localStorage.setItem("cart", JSON.stringify(state.cart));
   }, [state.cart]);
 
   return (
@@ -107,6 +119,4 @@ export const StoreProvider = ({ children }) => {
       {children}
     </StoreContext.Provider>
   );
-
 };
-

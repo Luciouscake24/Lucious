@@ -2,7 +2,7 @@ import React, { createContext, useReducer, useEffect } from "react";
 
 export const StoreContext = createContext();
 
-/* LOAD CART FROM LOCAL STORAGE */
+/* LOAD CART */
 
 const loadCart = () => {
   try {
@@ -12,8 +12,19 @@ const loadCart = () => {
   }
 };
 
+/* LOAD SAVE FOR LATER */
+
+const loadSaved = () => {
+  try {
+    return JSON.parse(localStorage.getItem("saveForLater")) || [];
+  } catch {
+    return [];
+  }
+};
+
 const initialState = {
-  cart: loadCart()
+  cart: loadCart(),
+  saveForLater: loadSaved()
 };
 
 /* REDUCER */
@@ -62,7 +73,7 @@ function reducer(state, action) {
       };
     }
 
-    /* INCREASE */
+    /* INCREASE QTY */
 
     case "INCREASE_QTY":
 
@@ -75,7 +86,7 @@ function reducer(state, action) {
         )
       };
 
-    /* DECREASE */
+    /* DECREASE QTY */
 
     case "DECREASE_QTY":
 
@@ -90,14 +101,54 @@ function reducer(state, action) {
           .filter(item => item.quantity > 0)
       };
 
-    /* REMOVE */
+    /* REMOVE FROM CART */
 
     case "REMOVE_FROM_CART":
 
       return {
         ...state,
-        cart: state.cart.filter(item => item._id !== action.payload)
+        cart: state.cart.filter(
+          item => item._id !== action.payload
+        )
       };
+
+    /* SAVE FOR LATER */
+
+    case "SAVE_FOR_LATER": {
+
+      const item = state.cart.find(
+        i => i._id === action.payload
+      );
+
+      if (!item) return state;
+
+      return {
+        ...state,
+        cart: state.cart.filter(
+          i => i._id !== action.payload
+        ),
+        saveForLater: [...state.saveForLater, item]
+      };
+    }
+
+    /* MOVE BACK TO CART */
+
+    case "MOVE_TO_CART": {
+
+      const item = state.saveForLater.find(
+        i => i._id === action.payload
+      );
+
+      if (!item) return state;
+
+      return {
+        ...state,
+        saveForLater: state.saveForLater.filter(
+          i => i._id !== action.payload
+        ),
+        cart: [...state.cart, item]
+      };
+    }
 
     default:
       return state;
@@ -108,11 +159,26 @@ function reducer(state, action) {
 
 export const StoreProvider = ({ children }) => {
 
-  const [state, dispatch] = useReducer(reducer, initialState);
+  const [state, dispatch] = useReducer(
+    reducer,
+    initialState
+  );
+
+  /* SAVE TO LOCALSTORAGE */
 
   useEffect(() => {
-    localStorage.setItem("cart", JSON.stringify(state.cart));
-  }, [state.cart]);
+
+    localStorage.setItem(
+      "cart",
+      JSON.stringify(state.cart)
+    );
+
+    localStorage.setItem(
+      "saveForLater",
+      JSON.stringify(state.saveForLater)
+    );
+
+  }, [state.cart, state.saveForLater]);
 
   return (
     <StoreContext.Provider value={{ state, dispatch }}>

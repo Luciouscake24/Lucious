@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import "./Collections.css";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import API from "../../config/api";   // ⭐ Import API base URL
+
 
 const Collections = () => {
 
@@ -12,7 +14,7 @@ const Collections = () => {
 
     const fetchCollections = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/meta/collection");
+        const res = await axios.get(`${API}/meta/collection`);
         console.log(res.data);
         setCollections(res.data);
       } catch (err) {

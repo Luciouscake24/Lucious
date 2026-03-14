@@ -3,6 +3,7 @@ import "./Products.css";
 import { Heart, ShoppingCart } from "lucide-react";
 import axios from "axios";
 import { StoreContext } from "../../context/StoreContext";
+import API from "../../config/api";   // ⭐ NEW IMPORT
 
 const Products = () => {
 
@@ -17,7 +18,7 @@ const Products = () => {
   useEffect(()=>{
 
     axios
-      .get("http://localhost:5000/api/product/bestsellers")
+      .get(`${API}/product/bestsellers`)   // ⭐ UPDATED URL
       .then(res => setProducts(res.data))
       .catch(err => console.log(err));
 
@@ -43,7 +44,6 @@ const Products = () => {
             {/* IMAGE */}
             <div className="product-img">
 
-              {/* ✅ Updated image source */}
               <img
                 src={item.image}
                 alt={item.name}
@@ -66,7 +66,6 @@ const Products = () => {
 
               <p className="price">₹{item.price}</p>
 
-              {/* 🛒 ADD / STEPPER */}
               {getQty(item._id) === 0 ? (
 
                 <button

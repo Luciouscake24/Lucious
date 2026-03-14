@@ -3,6 +3,7 @@ import { X, ShoppingCart, ArrowLeft } from "lucide-react";
 import { useContext, useState, useEffect } from "react";
 import { StoreContext } from "../../context/StoreContext";
 import axios from "axios";
+import API from "../../config/api"; 
 
 const CategoryModal = ({ category, closeModal }) => {
 
@@ -30,14 +31,14 @@ const CategoryModal = ({ category, closeModal }) => {
   useEffect(() => {
 
     axios
-      .get("http://localhost:5000/api/meta/collection")
+      .get(`${API}/meta/collection`)
       .then(res => {
         console.log("Collections:", res.data);
         setCollections(res.data);
       });
 
     axios
-      .get("http://localhost:5000/api/product/list")
+      .get(`${API}/product/list`)
       .then(res => {
         console.log("Products:", res.data);
         setProducts(res.data);

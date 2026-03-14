@@ -8,35 +8,35 @@ const CartDrawer = ({ open, setOpen }) => {
   const cart = state?.cart || [];
 
   const totalItems = cart.reduce(
-    (a,b)=>a+b.quantity,0
+    (a, b) => a + b.quantity, 0
   );
 
   const totalPrice = cart.reduce(
-    (a,b)=>a+b.price*b.quantity,0
+    (a, b) => a + b.price * b.quantity, 0
   );
 
-  const increase = (id)=>{
-    dispatch({type:"INCREASE_QTY",payload:id});
+  const increase = (id) => {
+    dispatch({ type: "INCREASE_QTY", payload: id });
   };
 
-  const decrease = (id)=>{
-    dispatch({type:"DECREASE_QTY",payload:id});
+  const decrease = (id) => {
+    dispatch({ type: "DECREASE_QTY", payload: id });
   };
 
-  const remove = (id)=>{
-    dispatch({type:"REMOVE_FROM_CART",payload:id});
+  const remove = (id) => {
+    dispatch({ type: "REMOVE_FROM_CART", payload: id });
   };
 
   return (
 
     <div
-      className={`drawer-overlay ${open?"show":""}`}
-      onClick={()=>setOpen(false)}
+      className={`drawer-overlay ${open ? "show" : ""}`}
+      onClick={() => setOpen(false)}
     >
 
       <div
-        className={`drawer ${open?"open":""}`}
-        onClick={(e)=>e.stopPropagation()}
+        className={`drawer ${open ? "open" : ""}`}
+        onClick={(e) => e.stopPropagation()}
       >
 
         {/* HEADER */}
@@ -47,7 +47,7 @@ const CartDrawer = ({ open, setOpen }) => {
 
           <button
             className="close-btn"
-            onClick={()=>setOpen(false)}
+            onClick={() => setOpen(false)}
           >
             ✕
           </button>
@@ -58,13 +58,13 @@ const CartDrawer = ({ open, setOpen }) => {
 
         <div className="drawer-items">
 
-          {cart.length===0 && (
+          {cart.length === 0 && (
             <p className="empty-cart">
               Your cart is empty 🛒
             </p>
           )}
 
-          {cart.map(item=>(
+          {cart.map(item => (
 
             <div
               key={item._id}
@@ -72,10 +72,10 @@ const CartDrawer = ({ open, setOpen }) => {
             >
 
               <img
-                src={`http://localhost:5000/${item.image}`}
+                src={item.image}
                 alt={item.name}
-                onError={(e)=>{
-                  e.target.src="/cake-placeholder.jpg";
+                onError={(e) => {
+                  e.target.src = "/cake-placeholder.jpg";
                 }}
               />
 
@@ -90,7 +90,7 @@ const CartDrawer = ({ open, setOpen }) => {
                 <div className="qty-box">
 
                   <button
-                    onClick={()=>decrease(item._id)}
+                    onClick={() => decrease(item._id)}
                   >
                     −
                   </button>
@@ -98,7 +98,7 @@ const CartDrawer = ({ open, setOpen }) => {
                   <span>{item.quantity}</span>
 
                   <button
-                    onClick={()=>increase(item._id)}
+                    onClick={() => increase(item._id)}
                   >
                     +
                   </button>
@@ -109,7 +109,7 @@ const CartDrawer = ({ open, setOpen }) => {
 
               <button
                 className="remove-btn"
-                onClick={()=>remove(item._id)}
+                onClick={() => remove(item._id)}
               >
                 🗑
               </button>
@@ -122,7 +122,7 @@ const CartDrawer = ({ open, setOpen }) => {
 
         {/* FOOTER */}
 
-        {cart.length>0 && (
+        {cart.length > 0 && (
 
           <div className="drawer-footer">
 

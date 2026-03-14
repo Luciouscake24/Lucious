@@ -1,5 +1,4 @@
-// Base API URL for backend requests
 
-const API = "http://localhost:5000/api";
+const API = "https://lucious-qty1.onrender.com";
 
 export default API;

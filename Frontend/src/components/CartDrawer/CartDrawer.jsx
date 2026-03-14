@@ -1,4 +1,5 @@
 import { useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import { StoreContext } from "../../context/StoreContext";
 import { optimizeImage } from "../../utils/image";
 
@@ -17,6 +18,7 @@ import "./CartDrawer.css";
 const CartDrawer = ({ open, setOpen }) => {
 
   const { state, dispatch } = useContext(StoreContext);
+  const navigate = useNavigate();
 
   const cart = state?.cart || [];
   const saveForLater = state?.saveForLater || [];
@@ -45,6 +47,11 @@ const CartDrawer = ({ open, setOpen }) => {
 
   const moveToCart = (id)=>{
     dispatch({type:"MOVE_TO_CART",payload:id});
+  };
+
+  const handleCheckout = ()=>{
+    setOpen(false);
+    navigate("/checkout");
   };
 
   return(
@@ -231,7 +238,10 @@ const CartDrawer = ({ open, setOpen }) => {
               <strong>₹{totalPrice}</strong>
             </div>
 
-            <button className="checkout-btn">
+            <button
+              className="checkout-btn"
+              onClick={handleCheckout}
+            >
               Checkout
             </button>
 

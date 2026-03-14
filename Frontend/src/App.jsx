@@ -10,6 +10,7 @@ import AddCategory from "./admin/Pages/AddCategory/AddCategory";
 import AddCollections from "./admin/Pages/AddCollections/AddCollections";
 import AddOccasion from "./admin/Pages/AddOccasion/AddOccasion";
 import AddTags from "./admin/Pages/AddTags/AddTags";
+import CheckoutPage from "./pages/Checkout/Checkout";
 
 const App = () => {
   return (
@@ -18,6 +19,7 @@ const App = () => {
       {/* USER WEBSITE */}
       <Route path="/" element={<Home />} />
       <Route path="/shop" element={<ShopPage/>} />
+      <Route path="/checkout" element={<CheckoutPage />} />
 
       {/* ADMIN ROUTES */}
       <Route path="/admin" element={<AdminLayout />}>

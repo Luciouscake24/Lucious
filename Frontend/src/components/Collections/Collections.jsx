@@ -6,24 +6,23 @@ import axios from "axios";
 const Collections = () => {
 
   const navigate = useNavigate();
-  const [collections,setCollections] = useState([]);
+  const [collections, setCollections] = useState([]);
 
-  useEffect(()=>{
+  useEffect(() => {
 
     const fetchCollections = async () => {
-      try{
+      try {
         const res = await axios.get("http://localhost:5000/api/meta/collection");
         console.log(res.data);
-
         setCollections(res.data);
-      }catch(err){
+      } catch (err) {
         console.log(err);
       }
     };
 
     fetchCollections();
 
-  },[]);
+  }, []);
 
   return (
     <section className="collections">
@@ -45,9 +44,11 @@ const Collections = () => {
 
           <div className="collection-card" key={col._id}>
 
+            {/* Updated Image Source */}
             <img
-              src={`http://localhost:5000/${col.image}`}
+              src={col.image}
               alt={col.name}
+              loading="lazy"
             />
 
             <div className="collection-overlay">

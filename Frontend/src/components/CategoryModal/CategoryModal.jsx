@@ -179,10 +179,13 @@ const CategoryModal = ({ category, closeModal }) => {
               >
 
                 <img
-                  src={`http://localhost:5000/${col.image}`}
+                  src={col.image}
                   alt={col.name}
+                  loading="lazy"
+                  onError={(e) => {
+                    e.target.src = "/placeholder.png";
+                  }}
                 />
-
                 <h3>{col.name}</h3>
 
                 <button className="add-btn">
@@ -249,8 +252,12 @@ const CategoryModal = ({ category, closeModal }) => {
                 >
 
                   <img
-                    src={`http://localhost:5000/${cake.image}`}
+                    src={cake.image}
                     alt={cake.name}
+                    loading="lazy"
+                    onError={(e) => {
+                      e.target.src = "/placeholder.png";
+                    }}
                   />
 
                   <h3>{cake.name}</h3>
@@ -263,7 +270,7 @@ const CategoryModal = ({ category, closeModal }) => {
                       className="add-btn"
                       onClick={() => handleAddFirstTime(cake)}
                     >
-                      <ShoppingCart size={16}/>
+                      <ShoppingCart size={16} />
                       Add to Cart
                     </button>
 

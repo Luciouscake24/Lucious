@@ -41,12 +41,16 @@ const Products = () => {
           <div className="product-card" key={item._id}>
 
             {/* IMAGE */}
-
             <div className="product-img">
 
+              {/* ✅ Updated image source */}
               <img
-                src={`http://localhost:5000/${item.image}`}
+                src={item.image}
                 alt={item.name}
+                loading="lazy"
+                onError={(e)=>{
+                  e.target.src="/placeholder.png";
+                }}
               />
 
               <span className="wishlist">
@@ -56,7 +60,6 @@ const Products = () => {
             </div>
 
             {/* INFO */}
-
             <div className="product-info">
 
               <h3>{item.name}</h3>
@@ -64,7 +67,6 @@ const Products = () => {
               <p className="price">₹{item.price}</p>
 
               {/* 🛒 ADD / STEPPER */}
-
               {getQty(item._id) === 0 ? (
 
                 <button

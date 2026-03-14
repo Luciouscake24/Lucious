@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import "./Collections.css";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import API from "../../config/api";   // ⭐ Import API base URL
-
+import API from "../../config/api";
+import { optimizeImage } from "../../utils/image";   // ⭐ NEW IMPORT
 
 const Collections = () => {
 
@@ -46,11 +46,13 @@ const Collections = () => {
 
           <div className="collection-card" key={col._id}>
 
-            {/* Updated Image Source */}
             <img
-              src={col.image}
+              src={optimizeImage(col.image)}   // ⭐ OPTIMIZED IMAGE
               alt={col.name}
               loading="lazy"
+              onError={(e)=>{
+                e.target.src="/placeholder.png";
+              }}
             />
 
             <div className="collection-overlay">

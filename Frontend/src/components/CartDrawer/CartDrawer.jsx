@@ -1,5 +1,6 @@
 import { useContext } from "react";
 import { StoreContext } from "../../context/StoreContext";
+import { optimizeImage } from "../../utils/image";   // ⭐ NEW IMPORT
 import "./CartDrawer.css";
 
 const CartDrawer = ({ open, setOpen }) => {
@@ -72,8 +73,9 @@ const CartDrawer = ({ open, setOpen }) => {
             >
 
               <img
-                src={item.image}
+                src={optimizeImage(item.image)}   // ⭐ OPTIMIZED IMAGE
                 alt={item.name}
+                loading="lazy"
                 onError={(e) => {
                   e.target.src = "/cake-placeholder.jpg";
                 }}

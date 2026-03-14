@@ -3,7 +3,8 @@ import { X, ShoppingCart, ArrowLeft } from "lucide-react";
 import { useContext, useState, useEffect } from "react";
 import { StoreContext } from "../../context/StoreContext";
 import axios from "axios";
-import API from "../../config/api"; 
+import API from "../../config/api";
+import { optimizeImage } from "../../utils/image";   // ⭐ NEW IMPORT
 
 const CategoryModal = ({ category, closeModal }) => {
 
@@ -180,13 +181,14 @@ const CategoryModal = ({ category, closeModal }) => {
               >
 
                 <img
-                  src={col.image}
+                  src={optimizeImage(col.image)}   // ⭐ OPTIMIZED
                   alt={col.name}
                   loading="lazy"
                   onError={(e) => {
                     e.target.src = "/placeholder.png";
                   }}
                 />
+
                 <h3>{col.name}</h3>
 
                 <button className="add-btn">
@@ -253,7 +255,7 @@ const CategoryModal = ({ category, closeModal }) => {
                 >
 
                   <img
-                    src={cake.image}
+                    src={optimizeImage(cake.image)}   // ⭐ OPTIMIZED
                     alt={cake.name}
                     loading="lazy"
                     onError={(e) => {

@@ -3,7 +3,8 @@ import "./Products.css";
 import { Heart, ShoppingCart } from "lucide-react";
 import axios from "axios";
 import { StoreContext } from "../../context/StoreContext";
-import API from "../../config/api";   // ⭐ NEW IMPORT
+import API from "../../config/api";
+import { optimizeImage } from "../../utils/image";   // ⭐ NEW IMPORT
 
 const Products = () => {
 
@@ -18,7 +19,7 @@ const Products = () => {
   useEffect(()=>{
 
     axios
-      .get(`${API}/product/bestsellers`)   // ⭐ UPDATED URL
+      .get(`${API}/product/bestsellers`)
       .then(res => setProducts(res.data))
       .catch(err => console.log(err));
 
@@ -45,7 +46,7 @@ const Products = () => {
             <div className="product-img">
 
               <img
-                src={item.image}
+                src={optimizeImage(item.image)}   // ⭐ OPTIMIZED IMAGE
                 alt={item.name}
                 loading="lazy"
                 onError={(e)=>{

@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import "./CelebrationSection.css";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import API from "../../config/api";   
+import API from "../../config/api";
+import { optimizeImage } from "../../utils/image";   // ⭐ NEW IMPORT
 
 const CelebrationSection = () => {
 
@@ -12,7 +13,7 @@ const CelebrationSection = () => {
   useEffect(() => {
 
     axios
-      .get(`${API}/meta/occasion`) 
+      .get(`${API}/meta/occasion`)
       .then((res) => {
         setOccasions(res.data);
       })
@@ -46,7 +47,7 @@ const CelebrationSection = () => {
             <div className="celebration-img">
 
               <img
-                src={event.image}
+                src={optimizeImage(event.image)}   // ⭐ OPTIMIZED IMAGE
                 alt={event.name}
                 loading="lazy"
                 onError={(e)=>{

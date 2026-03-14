@@ -4,7 +4,8 @@ import axios from "axios";
 import Navbar from "../../components/Navbar/Navbar";
 import Footer from "../../components/Footer/Footer";
 import ProductCard from "../../components/ProductCard/ProductCard";
-import API from "../../config/api";   // ⭐ NEW IMPORT
+import ProductSkeleton from "../../components/Skeleton/ProductsSkeleton"; // ⭐ SKELETON
+import API from "../../config/api";
 import "./ShopPage.css";
 
 /* Filter Lists */
@@ -91,73 +92,46 @@ const ShopPage = () => {
 
     let result = products;
 
-    /* CATEGORY FILTER */
-
     if (categoryQuery) {
-
       const cat = categories.find(c => c.slug === categoryQuery);
-
       if (cat) {
         result = result.filter(
           p => String(p.categoryId) === String(cat._id) || p.categoryId === cat.slug
         );
       }
-
     }
 
-    /* COLLECTION FILTER */
-
     if (collectionQuery) {
-
       const col = collections.find(c => c.slug === collectionQuery);
-
       if (col) {
         result = result.filter(
           p => String(p.collectionId) === String(col._id) || p.collectionId === col.slug
         );
       }
-
     }
 
-    /* OCCASION FILTER */
-
     if (occasionQuery) {
-
       const occ = occasions.find(o => o.slug === occasionQuery);
-
       if (occ) {
         result = result.filter(
           p => String(p.occasionId) === String(occ._id) || p.occasionId === occ.slug
         );
       }
-
     }
-
-    /* FLAVOUR */
 
     if (selectedFlavours.length)
       result = result.filter(p => selectedFlavours.includes(p.flavour));
 
-    /* DIET */
-
     if (selectedDiet.length)
       result = result.filter(p => selectedDiet.includes(p.diet));
-
-    /* CREAM */
 
     if (selectedCream.length)
       result = result.filter(p => selectedCream.includes(p.cream));
 
-    /* WEIGHT */
-
     if (selectedWeight.length)
       result = result.filter(p => selectedWeight.includes(p.weight));
 
-    /* PRICE */
-
     result = result.filter(p => p.price <= maxPrice);
-
-    /* SORT */
 
     if (sort === "low")
       result = [...result].sort((a,b)=>a.price-b.price);
@@ -200,20 +174,6 @@ const ShopPage = () => {
   if (occasionQuery) {
     const occ = occasions.find(o => o.slug === occasionQuery);
     if (occ) pageTitle = occ.name;
-  }
-
-  /* LOADING */
-
-  if (loading) {
-    return (
-      <>
-        <Navbar />
-        <div style={{padding:"120px", textAlign:"center"}}>
-          <h2>Loading cakes...</h2>
-        </div>
-        <Footer />
-      </>
-    );
   }
 
   return (
@@ -283,7 +243,17 @@ const ShopPage = () => {
               <p>{filteredProducts.length} cakes found</p>
             </div>
 
-            {filteredProducts.length === 0 ?
+            {loading ? (
+
+              <div className="product-grid">
+
+                {Array.from({length:8}).map((_,i)=>(
+                  <ProductSkeleton key={i}/>
+                ))}
+
+              </div>
+
+            ) : filteredProducts.length === 0 ?
 
               <p className="empty-msg">No cakes found 😔</p>
 

@@ -1,14 +1,17 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
+
 import Navbar from "../../components/Navbar/Navbar";
 import Footer from "../../components/Footer/Footer";
 import ProductCard from "../../components/ProductCard/ProductCard";
-import ProductSkeleton from "../../components/Skeleton/ProductsSkeleton"; // ⭐ SKELETON
+import ProductSkeleton from "../../components/Skeleton/ProductsSkeleton";
+
 import API from "../../config/api";
 import "./ShopPage.css";
 
-/* Filter Lists */
+/* FILTER LISTS */
+
 const flavoursList = ["chocolate","vanilla","butterscotch","red velvet","strawberry"];
 const dietList = ["egg","eggless"];
 const creamList = ["whipped","buttercream","truffle"];
@@ -29,36 +32,23 @@ const ShopPage = () => {
   const [occasions,setOccasions] = useState([]);
   const [loading,setLoading] = useState(true);
 
-  const [sort, setSort] = useState("");
-  const [maxPrice, setMaxPrice] = useState(5000);
+  const [sort,setSort] = useState("");
+  const [maxPrice,setMaxPrice] = useState(5000);
 
-  const [selectedFlavours, setSelectedFlavours] = useState([]);
-  const [selectedDiet, setSelectedDiet] = useState([]);
-  const [selectedCream, setSelectedCream] = useState([]);
-  const [selectedWeight, setSelectedWeight] = useState([]);
-
-  const [openSection, setOpenSection] = useState(null);
-
-  const toggleSection = (section) =>
-    setOpenSection(prev => prev === section ? null : section);
-
-  const toggleFilter = (value, list, setList) => {
-    setList(prev =>
-      prev.includes(value)
-        ? prev.filter(i => i !== value)
-        : [...prev, value]
-    );
-  };
+  const [selectedFlavours,setSelectedFlavours] = useState([]);
+  const [selectedDiet,setSelectedDiet] = useState([]);
+  const [selectedCream,setSelectedCream] = useState([]);
+  const [selectedWeight,setSelectedWeight] = useState([]);
 
   /* FETCH DATA */
 
-  useEffect(() => {
+  useEffect(()=>{
 
-    const fetchData = async () => {
+    const fetchData = async ()=>{
 
-      try {
+      try{
 
-        const [prodRes, catRes, colRes, occRes] = await Promise.all([
+        const [prodRes,catRes,colRes,occRes] = await Promise.all([
           axios.get(`${API}/product/list`),
           axios.get(`${API}/meta/category`),
           axios.get(`${API}/meta/collection`),
@@ -70,80 +60,132 @@ const ShopPage = () => {
         setCollections(colRes.data);
         setOccasions(occRes.data);
 
-      } catch (err) {
-
+      }catch(err){
         console.log(err);
-
-      } finally {
-
+      }finally{
         setLoading(false);
-
       }
 
     };
 
     fetchData();
 
-  }, []);
+  },[]);
 
   /* FILTER ENGINE */
 
-  const filteredProducts = useMemo(() => {
+  const filteredProducts = useMemo(()=>{
 
-    let result = products;
+    let result = [...products];
+
+    /* CATEGORY FILTER */
 
     if (categoryQuery) {
-      const cat = categories.find(c => c.slug === categoryQuery);
-      if (cat) {
-        result = result.filter(
-          p => String(p.categoryId) === String(cat._id) || p.categoryId === cat.slug
-        );
-      }
+
+      result = result.filter(product => {
+
+        const slug =
+          product?.categoryId?.slug ||
+          product?.category?.slug ||
+          product?.categorySlug ||
+          product?.category;
+
+        return slug === categoryQuery;
+
+      });
+
     }
 
-    if (collectionQuery) {
+    /* COLLECTION FILTER */
+
+    if(collectionQuery && collections.length){
+
       const col = collections.find(c => c.slug === collectionQuery);
-      if (col) {
-        result = result.filter(
-          p => String(p.collectionId) === String(col._id) || p.collectionId === col.slug
-        );
+
+      if(col){
+
+        result = result.filter(product=>{
+
+          if(!product.collectionId) return false;
+
+          if(typeof product.collectionId === "object"){
+            return (
+              String(product.collectionId._id) === String(col._id) ||
+              product.collectionId.slug === col.slug
+            );
+          }
+
+          return String(product.collectionId) === String(col._id);
+
+        });
+
       }
+
     }
 
-    if (occasionQuery) {
+    /* OCCASION FILTER */
+
+    if(occasionQuery && occasions.length){
+
       const occ = occasions.find(o => o.slug === occasionQuery);
-      if (occ) {
-        result = result.filter(
-          p => String(p.occasionId) === String(occ._id) || p.occasionId === occ.slug
-        );
+
+      if(occ){
+
+        result = result.filter(product=>{
+
+          if(!product.occasionId) return false;
+
+          if(typeof product.occasionId === "object"){
+            return (
+              String(product.occasionId._id) === String(occ._id) ||
+              product.occasionId.slug === occ.slug
+            );
+          }
+
+          return String(product.occasionId) === String(occ._id);
+
+        });
+
       }
+
     }
 
-    if (selectedFlavours.length)
-      result = result.filter(p => selectedFlavours.includes(p.flavour));
+    /* FLAVOUR FILTER */
 
-    if (selectedDiet.length)
-      result = result.filter(p => selectedDiet.includes(p.diet));
+    if(selectedFlavours.length)
+      result = result.filter(p=>selectedFlavours.includes(p.flavour));
 
-    if (selectedCream.length)
-      result = result.filter(p => selectedCream.includes(p.cream));
+    /* DIET FILTER */
 
-    if (selectedWeight.length)
-      result = result.filter(p => selectedWeight.includes(p.weight));
+    if(selectedDiet.length)
+      result = result.filter(p=>selectedDiet.includes(p.diet));
 
-    result = result.filter(p => p.price <= maxPrice);
+    /* CREAM FILTER */
 
-    if (sort === "low")
-      result = [...result].sort((a,b)=>a.price-b.price);
+    if(selectedCream.length)
+      result = result.filter(p=>selectedCream.includes(p.cream));
 
-    if (sort === "high")
-      result = [...result].sort((a,b)=>b.price-a.price);
+    /* WEIGHT FILTER */
+
+    if(selectedWeight.length)
+      result = result.filter(p=>selectedWeight.includes(p.weight));
+
+    /* PRICE FILTER */
+
+    result = result.filter(p=>p.price <= maxPrice);
+
+    /* SORT */
+
+    if(sort === "low")
+      result.sort((a,b)=>a.price-b.price);
+
+    if(sort === "high")
+      result.sort((a,b)=>b.price-a.price);
 
     return result;
 
   },[
     products,
-    categories,
     collections,
     occasions,
     categoryQuery,
@@ -161,19 +203,19 @@ const ShopPage = () => {
 
   let pageTitle = "All Cakes";
 
-  if (categoryQuery) {
-    const cat = categories.find(c => c.slug === categoryQuery);
-    if (cat) pageTitle = cat.name;
+  if(categoryQuery){
+    const cat = categories.find(c=>c.slug===categoryQuery);
+    if(cat) pageTitle = cat.name;
   }
 
-  if (collectionQuery) {
-    const col = collections.find(c => c.slug === collectionQuery);
-    if (col) pageTitle = col.name;
+  if(collectionQuery){
+    const col = collections.find(c=>c.slug===collectionQuery);
+    if(col) pageTitle = col.name;
   }
 
-  if (occasionQuery) {
-    const occ = occasions.find(o => o.slug === occasionQuery);
-    if (occ) pageTitle = occ.name;
+  if(occasionQuery){
+    const occ = occasions.find(o=>o.slug===occasionQuery);
+    if(occ) pageTitle = occ.name;
   }
 
   return (
@@ -191,7 +233,6 @@ const ShopPage = () => {
             <h3>Filters</h3>
 
             <div className="filter-group">
-
               <label>Sort by Price</label>
 
               <select value={sort} onChange={e=>setSort(e.target.value)}>
@@ -199,11 +240,9 @@ const ShopPage = () => {
                 <option value="low">Low → High</option>
                 <option value="high">High → Low</option>
               </select>
-
             </div>
 
             <div className="filter-group">
-
               <label>Max Price: ₹{maxPrice}</label>
 
               <input
@@ -211,26 +250,9 @@ const ShopPage = () => {
                 min="100"
                 max="5000"
                 value={maxPrice}
-                onChange={e=>setMaxPrice(e.target.value)}
+                onChange={e=>setMaxPrice(Number(e.target.value))}
               />
-
             </div>
-
-            <button
-              className="clear-btn"
-              onClick={()=>{
-
-                setSort("");
-                setMaxPrice(5000);
-                setSelectedFlavours([]);
-                setSelectedDiet([]);
-                setSelectedCream([]);
-                setSelectedWeight([]);
-
-              }}
-            >
-              Reset Filters ✖
-            </button>
 
           </aside>
 
@@ -257,17 +279,15 @@ const ShopPage = () => {
 
               <p className="empty-msg">No cakes found 😔</p>
 
-              :
+            :
 
               <div className="product-grid">
 
-                {filteredProducts.map(product => (
-
+                {filteredProducts.map(product=>(
                   <ProductCard
                     key={product._id}
                     product={product}
                   />
-
                 ))}
 
               </div>
@@ -281,9 +301,9 @@ const ShopPage = () => {
       </section>
 
       <Footer />
-
     </>
   );
+
 };
 
 export default ShopPage;

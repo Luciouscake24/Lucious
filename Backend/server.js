@@ -45,8 +45,16 @@ app.get("/", (req,res)=>{
 ========================= */
 
 app.use("/api/product", productRoutes);
+
+/* meta routes now include:
+   category
+   collection
+   occasion
+   cake-filter
+*/
 app.use("/api/meta", metaRoutes);
-app.use("/api/order", orderRoutes);   // 🧁 Checkout Orders
+
+app.use("/api/order", orderRoutes);
 
 /* =========================
    ERROR HANDLER

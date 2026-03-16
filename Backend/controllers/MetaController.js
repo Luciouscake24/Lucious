@@ -1,9 +1,17 @@
-
 export const createItem = (Model) => async (req,res) => {
 
   try{
 
     const data = { ...req.body };
+
+    /* AUTO SLUG */
+
+    if(data.name && !data.slug){
+      data.slug = data.name
+        .toLowerCase()
+        .replace(/\s+/g,"-")
+        .replace(/[^\w-]+/g,"");
+    }
 
     /* MULTI CATEGORY FIX */
 
@@ -41,7 +49,8 @@ export const getItems = (Model) => async (req,res) => {
 
     const items = await Model
       .find()
-      .sort({createdAt:-1});
+      .sort({createdAt:-1})
+      .lean();
 
     res.json(items);
 

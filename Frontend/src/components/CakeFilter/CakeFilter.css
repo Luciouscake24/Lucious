@@ -1,6 +1,5 @@
 .cake-filter{
-  padding:30px 30px 40px;
-  background:#fff;
+  padding:30px 30px 50px;
   text-align:center;
 }
 
@@ -12,42 +11,81 @@
 }
 
 /* ROW */
+
 .filter-row{
   display:flex;
   gap:20px;
   overflow-x:auto;
-  padding-bottom:30px;
-  justify-content:center;
+  overflow-y:hidden;
+  flex-wrap:nowrap;
+  justify-content:flex-start;
+  padding:30px;
+  scroll-behavior:smooth;
+}
+
+/* HIDE SCROLLBAR */
+
+.filter-row::-webkit-scrollbar{
+  display:none;
+}
+
+.filter-row{
+  -ms-overflow-style:none;
+  scrollbar-width:none;
 }
 
 /* CARD */
+
 .filter-card{
-  min-width:140px;
+  width:140px;          /* fixed width */
+  height:140px;         /* fixed height */
+  flex-shrink:0;        /* prevents shrinking */
+
   background:#fff5f7;
-  padding:22px 18px;
   border-radius:20px;
   cursor:pointer;
-  transition:.3s;
+  transition:all .3s ease;
   font-family:Poppins;
   color:#444;
   border:1px solid transparent;
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
 }
+
+/* ICON */
 
 .filter-card svg{
   color:rgb(230,90,120);
-  margin-bottom:8px;
+  margin-bottom:10px;
+  font-size:28px;
+  transition:.3s;
 }
+
+/* TEXT */
+
+.filter-card p{
+  font-size:14px;
+  font-weight:500;
+}
+
+/* HOVER */
 
 .filter-card:hover{
   transform:translateY(-6px);
   box-shadow:0 10px 25px rgba(0,0,0,0.08);
+  border-color:rgba(255,77,166,0.5);
 }
 
 /* ACTIVE CARD */
+
 .filter-card.active{
   background:rgb(230,90,120);
   color:white;
-  box-shadow:0 10px 25px rgba(230,90,120,0.4);
+  box-shadow:0 10px 25px rgba(230,90,120,0.35);
 }
 
 .filter-card.active svg{

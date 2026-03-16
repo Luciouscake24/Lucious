@@ -14,6 +14,8 @@ import CheckoutPage from "./pages/Checkout/Checkout";
 import Orders from "./admin/Pages/Orders/Order";
 import OrderSuccess from "./pages/OrderSuccess/OrderSuccess";
 import TrackOrder from "./pages/TrackOrder/TrackOrder";
+import CakeFilter from "./components/CakeFilter/CakeFilter";
+import CakeFilterAdmin from "./admin/Pages/CakeFilter/CakeFilterAdmin";
 
 const App = () => {
   return (
@@ -36,6 +38,7 @@ const App = () => {
         <Route path="add-occasions" element={<AddOccasion />} />
         <Route path="add-tags" element={<AddTags />} />
         <Route path="orders" element={<Orders/>} />
+        <Route path="CakeFilter" element={<CakeFilterAdmin/>} />
       </Route>
 
     </Routes>

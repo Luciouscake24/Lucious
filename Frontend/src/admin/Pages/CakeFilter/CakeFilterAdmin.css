@@ -1,0 +1,140 @@
+/* PAGE */
+
+.admin-page{
+  max-width:700px;
+  margin:auto;
+  padding:40px 20px;
+  font-family: "Poppins",sans-serif;
+  color:#fff;
+}
+
+/* TITLE */
+
+.admin-page h2{
+  text-align:center;
+  margin-bottom:30px;
+  font-size:28px;
+  letter-spacing:1px;
+  color:#ff4da6;
+}
+
+/* FORM */
+
+.admin-page > div{
+  display:flex;
+  gap:10px;
+  justify-content:center;
+  margin-bottom:30px;
+  flex-wrap:wrap;
+}
+
+/* INPUT */
+
+.admin-page input{
+  padding:12px 15px;
+  border-radius:8px;
+  border:1px solid #ff4da6;
+  background:#111;
+  color:#fff;
+  outline:none;
+  min-width:200px;
+  transition:0.3s;
+}
+
+.admin-page input::placeholder{
+  color:#aaa;
+}
+
+.admin-page input:focus{
+  border-color:#ff80c0;
+  box-shadow:0 0 8px rgba(255,77,166,0.4);
+}
+
+/* SELECT */
+
+.admin-page select{
+  padding:12px;
+  border-radius:8px;
+  border:1px solid #ff4da6;
+  background:#111;
+  color:#fff;
+  cursor:pointer;
+  outline:none;
+}
+
+/* BUTTON */
+
+.admin-page button{
+  padding:12px 20px;
+  border:none;
+  border-radius:8px;
+  background:linear-gradient(135deg,#ff4da6,#ff80c0);
+  color:#fff;
+  font-weight:600;
+  cursor:pointer;
+  transition:0.3s;
+}
+
+.admin-page button:hover{
+  transform:translateY(-2px);
+  box-shadow:0 5px 12px rgba(255,77,166,0.5);
+}
+
+/* FILTER LIST */
+
+.admin-page ul{
+  list-style:none;
+  padding:0;
+}
+
+/* LIST ITEM */
+
+.admin-page li{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:#111;
+  border:1px solid #222;
+  padding:12px 15px;
+  border-radius:8px;
+  margin-bottom:12px;
+  transition:0.3s;
+}
+
+/* HOVER EFFECT */
+
+.admin-page li:hover{
+  border-color:#ff4da6;
+  transform:scale(1.02);
+}
+
+/* DELETE BUTTON */
+
+.admin-page li button{
+  background:#ff4d6d;
+  padding:8px 12px;
+  font-size:14px;
+}
+
+.admin-page li button:hover{
+  background:#ff1f4b;
+}
+
+/* MOBILE */
+
+@media(max-width:600px){
+
+  .admin-page > div{
+    flex-direction:column;
+    align-items:center;
+  }
+
+  .admin-page input{
+    width:100%;
+  }
+
+  .admin-page select{
+    width:100%;
+  }
+
+}

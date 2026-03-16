@@ -6,6 +6,7 @@ import Category from "../models/CategoryModel.js";
 import Collection from "../models/CollectionModel.js";
 import Occasion from "../models/OccasionModel.js";
 import Tag from "../models/TagModel.js";
+import CakeFilter from "../models/CakeFilterModel.js";   // ✅ ADD THIS
 
 const router = express.Router();
 
@@ -28,5 +29,10 @@ router.delete("/occasion/:id", deleteItem(Occasion));
 router.post("/tag", createItem(Tag));
 router.get("/tag", getItems(Tag));
 router.delete("/tag/:id", deleteItem(Tag));
+
+/* CAKE FILTER */   
+router.post("/cake-filter", createItem(CakeFilter));
+router.get("/cake-filter", getItems(CakeFilter));
+router.delete("/cake-filter/:id", deleteItem(CakeFilter));
 
 export default router;

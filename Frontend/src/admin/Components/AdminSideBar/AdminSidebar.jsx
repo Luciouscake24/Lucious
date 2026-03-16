@@ -14,6 +14,7 @@ const AdminSidebar = () => {
       <Link to="/admin/add-occasions">Add Occasions</Link>
       <Link to="/admin/add-tags">Add Tags</Link>
       <Link to="/admin/orders">Orders</Link>
+      <Link to="/admin/CakeFilter">Cake Filter</Link>
     </div>
   );
 };

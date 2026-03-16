@@ -1,17 +1,23 @@
-
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
+
 import connectDB from "./config/db.js";
 
-import productRoutes from "./routes/ProductRoutes.js"; 
+/* ROUTES */
+import productRoutes from "./routes/ProductRoutes.js";
 import metaRoutes from "./routes/MetaRoutes.js";
+import orderRoutes from "./routes/OrderRoutes.js";
+
+/* MIDDLEWARE */
+import errorHandler from "./middleware/errorHandler.js";
 
 dotenv.config();
+
 const app = express();
 
 /* =========================
-   MIDDLEWARE
+   GLOBAL MIDDLEWARE
 ========================= */
 
 app.use(cors());
@@ -35,11 +41,18 @@ app.get("/", (req,res)=>{
 });
 
 /* =========================
-   ROUTES
+   API ROUTES
 ========================= */
 
 app.use("/api/product", productRoutes);
 app.use("/api/meta", metaRoutes);
+app.use("/api/order", orderRoutes);   // 🧁 Checkout Orders
+
+/* =========================
+   ERROR HANDLER
+========================= */
+
+app.use(errorHandler);
 
 /* =========================
    START SERVER
@@ -48,5 +61,5 @@ app.use("/api/meta", metaRoutes);
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT,()=>{
-  console.log("🚀 Server running on port "+PORT);
+  console.log(`🚀 Server running on port ${PORT}`);
 });

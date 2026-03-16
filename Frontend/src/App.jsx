@@ -11,6 +11,7 @@ import AddCollections from "./admin/Pages/AddCollections/AddCollections";
 import AddOccasion from "./admin/Pages/AddOccasion/AddOccasion";
 import AddTags from "./admin/Pages/AddTags/AddTags";
 import CheckoutPage from "./pages/Checkout/Checkout";
+import Orders from "./admin/Pages/Orders/Order";
 
 const App = () => {
   return (
@@ -30,6 +31,7 @@ const App = () => {
         <Route path="add-collections" element={<AddCollections />} />
         <Route path="add-occasions" element={<AddOccasion />} />
         <Route path="add-tags" element={<AddTags />} />
+        <Route path="orders" element={<Orders/>} />
       </Route>
 
     </Routes>

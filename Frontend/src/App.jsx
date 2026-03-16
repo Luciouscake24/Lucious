@@ -12,6 +12,8 @@ import AddOccasion from "./admin/Pages/AddOccasion/AddOccasion";
 import AddTags from "./admin/Pages/AddTags/AddTags";
 import CheckoutPage from "./pages/Checkout/Checkout";
 import Orders from "./admin/Pages/Orders/Order";
+import OrderSuccess from "./pages/OrderSuccess/OrderSuccess";
+import TrackOrder from "./pages/TrackOrder/TrackOrder";
 
 const App = () => {
   return (
@@ -21,6 +23,8 @@ const App = () => {
       <Route path="/" element={<Home />} />
       <Route path="/shop" element={<ShopPage/>} />
       <Route path="/checkout" element={<CheckoutPage />} />
+      <Route path="/order-success" element={<OrderSuccess/>} />
+      <Route path="/track-order" element={<TrackOrder/>} />
 
       {/* ADMIN ROUTES */}
       <Route path="/admin" element={<AdminLayout />}>

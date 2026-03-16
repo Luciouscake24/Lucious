@@ -22,6 +22,12 @@ const loadSaved = () => {
   }
 };
 
+/* CREATE UNIQUE VARIANT KEY */
+
+const getCartKey = (item) => {
+  return `${item._id}_${item.weight}_${item.flavour}_${item.deliveryDate}_${item.deliverySlot}`;
+};
+
 const initialState = {
   cart: loadCart(),
   saveForLater: loadSaved()
@@ -33,28 +39,21 @@ function reducer(state, action) {
 
   switch (action.type) {
 
-    /* ADD PRODUCT WITH CUSTOM OPTIONS */
+    /* ADD PRODUCT WITH VARIANT */
 
     case "ADD_TO_CART": {
 
+      const key = getCartKey(action.payload);
+
       const exist = state.cart.find(
-        item =>
-          item._id === action.payload._id &&
-          item.weight === action.payload.weight &&
-          item.flavour === action.payload.flavour &&
-          item.deliveryDate === action.payload.deliveryDate &&
-          item.deliverySlot === action.payload.deliverySlot
+        item => item.cartKey === key
       );
 
       if (exist) {
         return {
           ...state,
           cart: state.cart.map(item =>
-            item._id === action.payload._id &&
-            item.weight === action.payload.weight &&
-            item.flavour === action.payload.flavour &&
-            item.deliveryDate === action.payload.deliveryDate &&
-            item.deliverySlot === action.payload.deliverySlot
+            item.cartKey === key
               ? { ...item, quantity: item.quantity + 1 }
               : item
           )
@@ -67,7 +66,8 @@ function reducer(state, action) {
           ...state.cart,
           {
             ...action.payload,
-            quantity: 1
+            quantity: 1,
+            cartKey: key
           }
         ]
       };
@@ -80,7 +80,7 @@ function reducer(state, action) {
       return {
         ...state,
         cart: state.cart.map(item =>
-          item._id === action.payload
+          item.cartKey === action.payload
             ? { ...item, quantity: item.quantity + 1 }
             : item
         )
@@ -94,7 +94,7 @@ function reducer(state, action) {
         ...state,
         cart: state.cart
           .map(item =>
-            item._id === action.payload
+            item.cartKey === action.payload
               ? { ...item, quantity: item.quantity - 1 }
               : item
           )
@@ -108,7 +108,7 @@ function reducer(state, action) {
       return {
         ...state,
         cart: state.cart.filter(
-          item => item._id !== action.payload
+          item => item.cartKey !== action.payload
         )
       };
 
@@ -117,7 +117,7 @@ function reducer(state, action) {
     case "SAVE_FOR_LATER": {
 
       const item = state.cart.find(
-        i => i._id === action.payload
+        i => i.cartKey === action.payload
       );
 
       if (!item) return state;
@@ -125,7 +125,7 @@ function reducer(state, action) {
       return {
         ...state,
         cart: state.cart.filter(
-          i => i._id !== action.payload
+          i => i.cartKey !== action.payload
         ),
         saveForLater: [...state.saveForLater, item]
       };
@@ -136,7 +136,7 @@ function reducer(state, action) {
     case "MOVE_TO_CART": {
 
       const item = state.saveForLater.find(
-        i => i._id === action.payload
+        i => i.cartKey === action.payload
       );
 
       if (!item) return state;
@@ -144,11 +144,20 @@ function reducer(state, action) {
       return {
         ...state,
         saveForLater: state.saveForLater.filter(
-          i => i._id !== action.payload
+          i => i.cartKey !== action.payload
         ),
         cart: [...state.cart, item]
       };
     }
+
+    /* CLEAR CART AFTER ORDER */
+
+    case "CLEAR_CART":
+
+      return {
+        ...state,
+        cart: []
+      };
 
     default:
       return state;
@@ -164,7 +173,7 @@ export const StoreProvider = ({ children }) => {
     initialState
   );
 
-  /* SAVE TO LOCALSTORAGE */
+  /* SAVE TO LOCAL STORAGE */
 
   useEffect(() => {
 

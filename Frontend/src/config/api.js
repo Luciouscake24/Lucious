@@ -1,4 +1,4 @@
 
-const API = "https://lucious-qty1.onrender.com";
+const API = "http://localhost:5000/api";
 
 export default API;

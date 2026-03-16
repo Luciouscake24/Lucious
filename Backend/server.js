@@ -8,6 +8,8 @@ import connectDB from "./config/db.js";
 import productRoutes from "./routes/ProductRoutes.js";
 import metaRoutes from "./routes/MetaRoutes.js";
 import orderRoutes from "./routes/OrderRoutes.js";
+import authRoutes from "./routes/AuthRoutes.js";
+import userRoutes from "./routes/UserRoutes.js";
 
 /* MIDDLEWARE */
 import errorHandler from "./middleware/errorHandler.js";
@@ -16,58 +18,35 @@ dotenv.config();
 
 const app = express();
 
-/* =========================
-   GLOBAL MIDDLEWARE
-========================= */
+/* GLOBAL MIDDLEWARE */
 
 app.use(cors());
 app.use(express.json());
 
-/* serve uploaded files */
 app.use("/uploads", express.static("uploads"));
-
-/* =========================
-   CONNECT DATABASE
-========================= */
 
 connectDB();
 
-/* =========================
-   TEST ROUTE
-========================= */
+/* TEST */
 
-app.get("/", (req,res)=>{
-  res.send("🎂 Lucious Cake API running...");
+app.get("/",(req,res)=>{
+res.send("🎂 Lucious Cake API running...");
 });
 
-/* =========================
-   API ROUTES
-========================= */
+/* API */
 
-app.use("/api/product", productRoutes);
+app.use("/api/auth",authRoutes);
+app.use("/api/user",userRoutes);
+app.use("/api/product",productRoutes);
+app.use("/api/meta",metaRoutes);
+app.use("/api/order",orderRoutes);
 
-/* meta routes now include:
-   category
-   collection
-   occasion
-   cake-filter
-*/
-app.use("/api/meta", metaRoutes);
-
-app.use("/api/order", orderRoutes);
-
-/* =========================
-   ERROR HANDLER
-========================= */
+/* ERROR */
 
 app.use(errorHandler);
-
-/* =========================
-   START SERVER
-========================= */
 
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT,()=>{
-  console.log(`🚀 Server running on port ${PORT}`);
+console.log(`🚀 Server running on port ${PORT}`);
 });

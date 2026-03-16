@@ -198,3 +198,62 @@
   font-size:13px;
   color:gray;
 }
+
+/* ACCOUNT DROPDOWN */
+
+.account{
+  position:relative;
+}
+
+.account-dropdown{
+  position:absolute;
+  top:50px;
+  right:0;
+  width:180px;
+  background:white;
+  border-radius:12px;
+  box-shadow:0 10px 25px rgba(0,0,0,0.1);
+  overflow:hidden;
+  z-index:2000;
+}
+
+.account-dropdown div{
+  padding:12px 16px;
+  font-size:14px;
+  cursor:pointer;
+  transition:.2s;
+  font-family:Poppins;
+}
+
+.account-dropdown div:hover{
+  background:#fff0f3;
+}
+
+.logout{
+  color:#e53935;
+  font-weight:500;
+}
+
+.account-dropdown{
+  position:absolute;
+  top:50px;
+  right:0;
+  width:180px;
+  background:white;
+  border-radius:12px;
+  box-shadow:0 10px 25px rgba(0,0,0,0.1);
+  overflow:hidden;
+  z-index:2000;
+
+  color:#333; /* FIX */
+} .account-dropdown div{
+  padding:12px 16px;
+  font-size:14px;
+  cursor:pointer;
+  transition:.2s;
+  font-family:Poppins;
+  color:#333; /* FIX */
+} .account-dropdown div:hover{
+  background:#fff0f3;
+  color:var(--pink);
+}

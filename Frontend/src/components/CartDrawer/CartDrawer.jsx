@@ -29,24 +29,26 @@ const CartDrawer = ({ open, setOpen }) => {
     (a,b)=> a + b.price * b.quantity,0
   );
 
-  const increase = (id)=>{
-    dispatch({type:"INCREASE_QTY",payload:id});
+  /* ACTIONS */
+
+  const increase = (key)=>{
+    dispatch({type:"INCREASE_QTY",payload:key});
   };
 
-  const decrease = (id)=>{
-    dispatch({type:"DECREASE_QTY",payload:id});
+  const decrease = (key)=>{
+    dispatch({type:"DECREASE_QTY",payload:key});
   };
 
-  const remove = (id)=>{
-    dispatch({type:"REMOVE_FROM_CART",payload:id});
+  const remove = (key)=>{
+    dispatch({type:"REMOVE_FROM_CART",payload:key});
   };
 
-  const saveItem = (id)=>{
-    dispatch({type:"SAVE_FOR_LATER",payload:id});
+  const saveItem = (key)=>{
+    dispatch({type:"SAVE_FOR_LATER",payload:key});
   };
 
-  const moveToCart = (id)=>{
-    dispatch({type:"MOVE_TO_CART",payload:id});
+  const moveToCart = (key)=>{
+    dispatch({type:"MOVE_TO_CART",payload:key});
   };
 
   const handleCheckout = ()=>{
@@ -95,8 +97,9 @@ const CartDrawer = ({ open, setOpen }) => {
           )}
 
           {cart.map(item=>(
+
             <div
-              key={item._id + item.weight + item.flavour}
+              key={item.cartKey}
               className="drawer-item"
             >
 
@@ -143,15 +146,17 @@ const CartDrawer = ({ open, setOpen }) => {
                   </p>
                 )}
 
+                {/* QUANTITY */}
+
                 <div className="qty-box">
 
-                  <button onClick={()=>decrease(item._id)}>
+                  <button onClick={()=>decrease(item.cartKey)}>
                     <Minus size={14}/>
                   </button>
 
                   <span>{item.quantity}</span>
 
-                  <button onClick={()=>increase(item._id)}>
+                  <button onClick={()=>increase(item.cartKey)}>
                     <Plus size={14}/>
                   </button>
 
@@ -159,18 +164,20 @@ const CartDrawer = ({ open, setOpen }) => {
 
               </div>
 
+              {/* ACTIONS */}
+
               <div className="item-actions">
 
                 <button
                   className="save-btn"
-                  onClick={()=>saveItem(item._id)}
+                  onClick={()=>saveItem(item.cartKey)}
                 >
                   <Bookmark size={14}/> Later
                 </button>
 
                 <button
                   className="remove-btn"
-                  onClick={()=>remove(item._id)}
+                  onClick={()=>remove(item.cartKey)}
                 >
                   <Trash2 size={16}/>
                 </button>
@@ -178,6 +185,7 @@ const CartDrawer = ({ open, setOpen }) => {
               </div>
 
             </div>
+
           ))}
 
         </div>
@@ -192,8 +200,9 @@ const CartDrawer = ({ open, setOpen }) => {
             <h3>Saved For Later</h3>
 
             {saveForLater.map(item=>(
+
               <div
-                key={item._id}
+                key={item.cartKey}
                 className="drawer-item saved"
               >
 
@@ -212,7 +221,7 @@ const CartDrawer = ({ open, setOpen }) => {
 
                   <button
                     className="move-btn"
-                    onClick={()=>moveToCart(item._id)}
+                    onClick={()=>moveToCart(item.cartKey)}
                   >
                     <RotateCcw size={14}/> Move to Cart
                   </button>
@@ -220,6 +229,7 @@ const CartDrawer = ({ open, setOpen }) => {
                 </div>
 
               </div>
+
             ))}
 
           </div>

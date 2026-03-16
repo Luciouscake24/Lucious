@@ -39,7 +39,7 @@ function reducer(state, action) {
 
   switch (action.type) {
 
-    /* ADD PRODUCT WITH VARIANT */
+    /* ADD PRODUCT */
 
     case "ADD_TO_CART": {
 
@@ -122,12 +122,18 @@ function reducer(state, action) {
 
       if (!item) return state;
 
+      const alreadySaved = state.saveForLater.find(
+        i => i.cartKey === action.payload
+      );
+
       return {
         ...state,
         cart: state.cart.filter(
           i => i.cartKey !== action.payload
         ),
-        saveForLater: [...state.saveForLater, item]
+        saveForLater: alreadySaved
+          ? state.saveForLater
+          : [...state.saveForLater, item]
       };
     }
 
@@ -141,14 +147,31 @@ function reducer(state, action) {
 
       if (!item) return state;
 
+      const exist = state.cart.find(
+        i => i.cartKey === action.payload
+      );
+
       return {
         ...state,
         saveForLater: state.saveForLater.filter(
           i => i.cartKey !== action.payload
         ),
-        cart: [...state.cart, item]
+        cart: exist
+          ? state.cart
+          : [...state.cart, item]
       };
     }
+
+    /* REMOVE FROM SAVE FOR LATER */
+
+    case "REMOVE_FROM_SAVED":
+
+      return {
+        ...state,
+        saveForLater: state.saveForLater.filter(
+          item => item.cartKey !== action.payload
+        )
+      };
 
     /* CLEAR CART AFTER ORDER */
 

@@ -1,0 +1,158 @@
+:root{
+  --pink: rgb(230,90,120);
+  --light-gray: #f8f8f8;
+  --text-gray: #666;
+}
+
+/* CONTAINER */
+
+.orders-container{
+  padding: 60px 20px;
+  margin-top: 60px;
+  max-width: 1000px;
+  margin-inline: auto;
+}
+
+.orders-container h2{
+  margin-bottom: 30px;
+  text-align: center;
+  font-size: 28px;
+  font-weight: 600;
+}
+
+/* CARD */
+
+.order-card{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 20px;
+  margin-bottom: 20px;
+
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+
+  transition: 0.3s ease;
+}
+
+.order-card:hover{
+  transform: translateY(-4px);
+}
+
+/* LEFT SIDE */
+
+.order-info{
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* STATUS */
+
+.status{
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  width: fit-content;
+}
+
+.status.Pending{
+  background: #fff3cd;
+  color: #856404;
+}
+
+.status.Confirmed{
+  background: #d1ecf1;
+  color: #0c5460;
+}
+
+.status.Preparing{
+  background: #ffe5d9;
+  color: #a94442;
+}
+
+.status.OutforDelivery{
+  background: #d6eaff;
+  color: #004085;
+}
+
+.status.Delivered{
+  background: #d4edda;
+  color: #155724;
+}
+
+/* ITEMS */
+
+.order-items{
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.order-item{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  background: #fafafa;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.order-item img{
+  width: 55px;
+  height: 55px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+/* ITEM DETAILS */
+
+.item-details{
+  display: flex;
+  flex-direction: column;
+}
+
+.item-name{
+  font-size: 14px;
+  font-weight: 500;
+  margin: 0;
+}
+
+.item-qty,
+.item-price{
+  font-size: 12px;
+  color: #666;
+  margin: 0;
+}
+
+/* BUTTON */
+
+.order-card button{
+  background: var(--pink);
+  border: none;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 14px;
+  white-space: nowrap;
+
+  transition: 0.3s;
+}
+
+.order-card button:hover{
+  opacity: 0.9;
+  transform: scale(1.05);
+}
+
+/* INFO TEXT */
+
+.info-text{
+  text-align: center;
+  color: var(--text-gray);
+}

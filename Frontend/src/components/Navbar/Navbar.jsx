@@ -180,10 +180,6 @@ const Navbar = () => {
                       My Orders
                     </div>
 
-                    <div onClick={()=>navigate("/track-order")}>
-                      Track Order
-                    </div>
-
                     <div>
                       Wishlist
                     </div>

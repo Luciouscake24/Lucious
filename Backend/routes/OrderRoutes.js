@@ -2,26 +2,30 @@ import express from "express";
 
 import {
   placeOrder,
-  getOrders
+  getOrders,
+  getMyOrders,
+  getSingleOrder,
+  updateOrderStatus
 } from "../controllers/OrderController.js";
 
 import validateOrder from "../middleware/ValidateOrder.js";
+import { protect, adminOnly } from "../middleware/AuthMiddleware.js";
 
 const router = express.Router();
 
-/* CREATE ORDER */
+/* PLACE ORDER */
+router.post("/", protect, validateOrder, placeOrder);
 
-router.post(
-  "/",
-  validateOrder,
-  placeOrder
-);
+/* USER ORDERS */
+router.get("/my", protect, getMyOrders);
 
-/* GET ORDERS */
+/* TRACK ORDER */
+router.get("/:id", protect, getSingleOrder);
 
-router.get(
-  "/",
-  getOrders
-);
+/* ADMIN */
+router.get("/", protect, adminOnly, getOrders);
+
+/* UPDATE STATUS */
+router.put("/:id", protect, adminOnly, updateOrderStatus);
 
 export default router;

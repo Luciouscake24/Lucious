@@ -1,0 +1,135 @@
+:root{
+  --pink: rgb(230,90,120);
+  --light-gray: #eee;
+  --text-gray: #666;
+}
+
+/* CONTAINER */
+
+.track-container{
+  padding: 90px 20px;
+  text-align: center;
+  background: #fafafa;
+  min-height: 80vh;
+}
+
+.track-container h2{
+  margin-bottom: 30px;
+}
+
+/* CARD */
+
+.track-card{
+  max-width: 550px;
+  margin: auto;
+  padding: 35px;
+
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+}
+
+/* STATUS BADGE */
+
+.status-badge{
+  background: var(--pink);
+  color: white;
+  padding: 10px 22px;
+  border-radius: 30px;
+  display: inline-block;
+  margin-bottom: 20px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+/* INFO TEXT */
+
+.info-text{
+  color: var(--text-gray);
+  font-size: 14px;
+}
+
+/* 🔥 PROGRESS WRAPPER */
+
+.progress-wrapper{
+  position: relative;
+  margin-top: 40px;
+}
+
+/* BASE LINE */
+
+.progress-line{
+  position: absolute;
+  top: 19px;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--light-gray);
+  z-index: 1;
+  border-radius: 10px;
+}
+
+/* ACTIVE LINE */
+
+.progress-fill{
+  position: absolute;
+  top: 19px;
+  left: 0;
+  height: 4px;
+  background: var(--pink);
+  z-index: 2;
+  border-radius: 10px;
+  transition: width 0.4s ease;
+}
+
+/* STEPS */
+
+.progress-steps{
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  z-index: 3;
+}
+
+/* STEP */
+
+.step{
+  text-align: center;
+  width: 100px;
+}
+
+/* CIRCLE */
+
+.circle{
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--light-gray);
+  margin: auto;
+  line-height: 38px;
+  font-size: 14px;
+  font-weight: bold;
+  color: #999;
+  transition: 0.3s;
+}
+
+/* ACTIVE */
+
+.step.active .circle{
+  background: var(--pink);
+  color: #fff;
+  transform: scale(1.1);
+}
+
+/* LABEL */
+
+.step p{
+  font-size: 12px;
+  margin-top: 8px;
+  color: var(--text-gray);
+}
+
+.step.active p{
+  color: var(--pink);
+  font-weight: 500;
+}

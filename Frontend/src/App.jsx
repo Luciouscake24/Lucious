@@ -16,6 +16,7 @@ import OrderSuccess from "./pages/OrderSuccess/OrderSuccess";
 import TrackOrder from "./pages/TrackOrder/TrackOrder";
 import CakeFilterAdmin from "./admin/Pages/CakeFilter/CakeFilterAdmin";
 import Users from "./admin/Pages/Users/Users";
+import OrderHistory from "./pages/OrderHistory/OrderHistory";
 
 const App = () => {
   return (
@@ -26,7 +27,8 @@ const App = () => {
       <Route path="/shop" element={<ShopPage/>} />
       <Route path="/checkout" element={<CheckoutPage />} />
       <Route path="/order-success" element={<OrderSuccess/>} />
-      <Route path="/track-order" element={<TrackOrder/>} />
+      <Route path= "/my-orders" element={<OrderHistory/>} />
+      <Route path="/track-order/:id" element={<TrackOrder/>} />
 
       {/* ADMIN ROUTES */}
       <Route path="/admin" element={<AdminLayout />}>

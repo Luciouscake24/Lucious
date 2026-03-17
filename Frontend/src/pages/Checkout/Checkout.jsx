@@ -63,22 +63,25 @@ const CheckoutPage = () => {
       setLoading(true);
 
       const orderData = {
-        customer: {
-          name: form.name,
-          phone: form.phone,
-          email: form.email,
-          address: form.address,
-          city: form.city,
-          pincode: form.pincode,
-          payment: form.payment
-        },
+  customer: {   // ✅ MUST be customer
+    name: form.name,
+    phone: form.phone,
+    email: form.email,
+    address: form.address,
+    city: form.city,
+    pincode: form.pincode,
+    payment: form.payment
+  },
 
-        items: cart.map(item => ({
-          _id: item._id,   // ✅ VERY IMPORTANT
-          quantity: item.quantity,
-          weight: item.weight,
-          flavour: item.flavour
-        })),
+  items: cart.map(item => ({
+    _id: item._id,   // backend expects this
+    quantity: item.quantity,
+    weight: item.weight,
+    flavour: item.flavour
+  })),
+
+
+
 
         total: totalPrice
       };

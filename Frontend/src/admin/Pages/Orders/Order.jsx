@@ -1,44 +1,70 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import API from "../../../config/api";
+import "./Order.css";
 
 const Orders = () => {
 
-  const [orders,setOrders] = useState([]);
-  const [loading,setLoading] = useState(true);
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const fetchOrders = async()=>{
+  // 🔔 Track previous order count
+  const [prevCount, setPrevCount] = useState(0);
 
-    try{
+  const fetchOrders = async () => {
+
+    try {
 
       const token = sessionStorage.getItem("token");
 
       const res = await axios.get(
         `${API}/order`,
         {
-          headers:{
-            Authorization:`Bearer ${token}`
+          headers: {
+            Authorization: `Bearer ${token}`
           }
         }
       );
 
+      console.log("Orders:", res.data);
+
       setOrders(res.data);
 
-    }catch(err){
+    } catch (err) {
       console.log(err.response?.data || err.message);
-    }finally{
+    } finally {
       setLoading(false);
     }
 
   };
 
-  useEffect(()=>{
+  useEffect(() => {
+
     fetchOrders();
-  },[]);
 
-  const updateStatus = async(id,status)=>{
+    // 🔄 Auto refresh every 5 sec
+    const interval = setInterval(() => {
+      fetchOrders();
+    }, 5000);
 
-    try{
+    return () => clearInterval(interval);
+
+  }, []);
+
+  // 🔔 Detect new order
+  useEffect(() => {
+
+    if (prevCount !== 0 && orders.length > prevCount) {
+      alert("🔔 New Order Received!");
+    }
+
+    setPrevCount(orders.length);
+
+  }, [orders]);
+
+  const updateStatus = async (id, status) => {
+
+    try {
 
       const token = sessionStorage.getItem("token");
 
@@ -46,21 +72,21 @@ const Orders = () => {
         `${API}/order/${id}`,
         { status },
         {
-          headers:{
-            Authorization:`Bearer ${token}`
+          headers: {
+            Authorization: `Bearer ${token}`
           }
         }
       );
 
       fetchOrders();
 
-    }catch(err){
+    } catch (err) {
       console.log(err.response?.data || err.message);
     }
 
   };
 
-  return(
+  return (
 
     <div className="admin-orders">
 
@@ -76,7 +102,10 @@ const Orders = () => {
 
           <thead>
             <tr>
-              <th>Customer</th>
+              <th>Name</th>
+              <th>Phone</th>
+              <th>Address</th>
+              <th>Items</th>
               <th>Total</th>
               <th>Status</th>
               <th>Action</th>
@@ -85,17 +114,51 @@ const Orders = () => {
 
           <tbody>
 
-            {orders.map(o=>(
+            {orders.map((o) => (
+
               <tr key={o._id}>
 
-                <td>{o.customer?.name}</td>
-                <td>₹{o.total}</td>
-                <td>{o.status}</td>
+                {/* 👤 CUSTOMER NAME */}
+                <td>{o.customer?.name || "N/A"}</td>
 
+                {/* 📞 PHONE */}
+                <td>{o.customer?.phone || "N/A"}</td>
+
+                {/* 📍 ADDRESS */}
+                <td>
+                  {o.customer
+                    ? `${o.customer.address}, ${o.customer.city || ""} - ${o.customer.pincode || ""}`
+                    : "N/A"}
+                </td>
+
+                {/* 🛒 ITEMS */}
+                <td>
+                  {o.items?.length > 0 ? (
+                    o.items.map((item, i) => (
+                      <div key={i}>
+                        {item.name} x {item.quantity}
+                      </div>
+                    ))
+                  ) : (
+                    "No items"
+                  )}
+                </td>
+
+                {/* 💰 TOTAL */}
+                <td>₹{o.total}</td>
+
+                {/* 📦 STATUS */}
+                <td>
+                  <span className={`status-badge ${o.status.replace(/\s/g, "")}`}>
+                    {o.status}
+                  </span>
+                </td>
+
+                {/* 🔄 ACTION */}
                 <td>
                   <select
                     value={o.status}
-                    onChange={(e)=>updateStatus(o._id,e.target.value)}
+                    onChange={(e) => updateStatus(o._id, e.target.value)}
                   >
                     <option value="Pending">Pending</option>
                     <option value="Preparing">Preparing</option>
@@ -105,6 +168,7 @@ const Orders = () => {
                 </td>
 
               </tr>
+
             ))}
 
           </tbody>

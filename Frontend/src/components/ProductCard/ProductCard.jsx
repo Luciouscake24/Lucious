@@ -1,5 +1,6 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { createPortal } from "react-dom";
 import { StoreContext } from "../../context/StoreContext";
 import { optimizeImage } from "../../utils/image";
 import "./ProductCard.css";
@@ -9,37 +10,60 @@ const ProductCard = ({ product }) => {
   const navigate = useNavigate();
   const { dispatch } = useContext(StoreContext);
 
-  const [showOptions,setShowOptions] = useState(false);
-  const [adding,setAdding] = useState(false);
-  const [toast,setToast] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [adding, setAdding] = useState(false);
 
-  const handleAddToCart = () => {
+  const [options, setOptions] = useState({
+    weight: "500g",
+    flavour: "chocolate",
+    date: "",
+    slot: "10AM - 1PM",
+    message: ""
+  });
+
+  /* LOCK BODY SCROLL */
+  useEffect(() => {
+    if (showModal) {
+      document.body.classList.add("modal-open");
+    } else {
+      document.body.classList.remove("modal-open");
+    }
+  }, [showModal]);
+
+  const confirmAdd = () => {
+
+    if (!options.date) {
+      alert("Select delivery date");
+      return;
+    }
 
     setAdding(true);
 
-    setTimeout(()=>{
+    setTimeout(() => {
 
       dispatch({
-        type:"ADD_TO_CART",
-        payload:product
+        type: "ADD_TO_CART",
+        payload: {
+          ...product,
+          weight: options.weight,
+          flavour: options.flavour,
+          deliveryDate: options.date,
+          deliverySlot: options.slot,
+          message: options.message
+        }
       });
 
       setAdding(false);
-      setShowOptions(false);
-      setToast(true);
+      setShowModal(false);
 
-      setTimeout(()=>{
-        setToast(false);
-      },2000);
-
-    },500);
-
+    }, 400);
   };
 
   return (
     <>
       <div className="product-card">
 
+        {/* IMAGE */}
         <div
           className="img-box"
           onClick={() => navigate(`/product/${product._id}`)}
@@ -47,28 +71,21 @@ const ProductCard = ({ product }) => {
           <img
             src={optimizeImage(product.image)}
             alt={product.name}
-            loading="lazy"
-            onError={(e)=>{
-              e.target.src="/cake-placeholder.jpg";
-            }}
           />
         </div>
 
+        {/* INFO */}
         <div className="product-info">
 
           <h3>{product.name}</h3>
-
-          <div className="tags">
-            {product.tags?.slice(0,2).map(tag => (
-              <span key={tag}>{tag}</span>
-            ))}
-          </div>
-
-          <p className="price">₹ {product.price}</p>
+          <p className="price">₹{product.price}</p>
 
           <button
             className="add-btn"
-            onClick={()=>setShowOptions(true)}
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowModal(true);
+            }}
           >
             Add to Cart 🛒
           </button>
@@ -77,74 +94,115 @@ const ProductCard = ({ product }) => {
 
       </div>
 
+      {/* 🔥 MODAL USING PORTAL */}
 
-      {/* OPTIONS MODAL */}
+      {showModal && createPortal(
 
-      {showOptions && (
+        <div
+          className="product-modal"
+          onClick={() => setShowModal(false)}
+        >
 
-        <div className="product-modal">
+          <div
+            className="modal-box"
+            onClick={(e) => e.stopPropagation()}
+          >
 
-          <div className="modal-box">
+            <button
+              className="modal-close"
+              onClick={() => setShowModal(false)}
+            >
+              ✕
+            </button>
 
-            <h2>{product.name}</h2>
+            <div className="modal-header">
 
-            <label>Weight</label>
-            <select>
-              <option>500g</option>
-              <option>1kg</option>
-              <option>1.5kg</option>
-            </select>
+              <img
+                src={optimizeImage(product.image)}
+                alt=""
+              />
 
+              <div>
+                <h2>{product.name}</h2>
+                <p className="modal-price">₹{product.price}</p>
+              </div>
+
+            </div>
+
+            {/* WEIGHT */}
+            <label>Choose Weight</label>
+            <div className="option-row">
+              {["500g", "1kg", "1.5kg"].map(w => (
+                <button
+                  key={w}
+                  className={`option-pill ${options.weight === w ? "active" : ""}`}
+                  onClick={() => setOptions({ ...options, weight: w })}
+                >
+                  {w}
+                </button>
+              ))}
+            </div>
+
+            {/* FLAVOUR */}
             <label>Flavour</label>
-            <select>
-              <option>Chocolate</option>
-              <option>Vanilla</option>
-              <option>Butterscotch</option>
-            </select>
+            <div className="option-row">
+              {["chocolate", "vanilla", "butterscotch"].map(f => (
+                <button
+                  key={f}
+                  className={`option-pill ${options.flavour === f ? "active" : ""}`}
+                  onClick={() => setOptions({ ...options, flavour: f })}
+                >
+                  {f}
+                </button>
+              ))}
+            </div>
 
+            {/* DATE */}
             <label>Delivery Date</label>
-            <input type="date"/>
+            <input
+              type="date"
+              className="modal-input"
+              onChange={(e) =>
+                setOptions({ ...options, date: e.target.value })
+              }
+            />
 
+            {/* SLOT */}
             <label>Delivery Slot</label>
-            <select>
+            <select
+              className="modal-input"
+              onChange={(e) =>
+                setOptions({ ...options, slot: e.target.value })
+              }
+            >
               <option>10AM - 1PM</option>
               <option>1PM - 4PM</option>
               <option>4PM - 7PM</option>
             </select>
 
+            {/* MESSAGE */}
             <label>Cake Message</label>
-            <input type="text" placeholder="Happy Birthday..." />
+            <input
+              className="modal-input"
+              placeholder="Happy Birthday..."
+              onChange={(e) =>
+                setOptions({ ...options, message: e.target.value })
+              }
+            />
 
             <button
               className="confirm-btn"
-              onClick={handleAddToCart}
+              onClick={confirmAdd}
               disabled={adding}
             >
-              {adding ? "Adding..." : "Confirm Add to Cart"}
-            </button>
-
-            <button
-              className="close-btn"
-              onClick={()=>setShowOptions(false)}
-            >
-              Close
+              {adding ? "Adding..." : "Add to Cart"}
             </button>
 
           </div>
+        </div>,
 
-        </div>
-
+        document.body
       )}
-
-
-      {/* SUCCESS MESSAGE */}
-
-      {toast && (
-        <div className="cart-toast">
-          ✔ Item added to cart
-        </div>
-      )}
-
     </>
   );
 };

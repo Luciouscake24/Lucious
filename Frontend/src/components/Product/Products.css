@@ -200,8 +200,8 @@
 ========================= */
 
 .modal-box{
-  width:440px;
-  max-width:95%;
+  width:100%;
+  max-width:280px; /* 🔥 control size here */
   max-height:85vh;
 
   background:linear-gradient(

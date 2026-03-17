@@ -12,10 +12,10 @@ import "./ShopPage.css";
 
 /* FILTER LISTS */
 
-const flavoursList = ["chocolate","vanilla","butterscotch","red velvet","strawberry"];
-const dietList = ["egg","eggless"];
-const creamList = ["whipped","buttercream","truffle"];
-const weightList = ["500g","1kg","2kg"];
+const flavoursList = ["chocolate", "vanilla", "butterscotch", "red velvet", "strawberry"];
+const dietList = ["egg", "eggless"];
+const creamList = ["whipped", "buttercream", "truffle"];
+const weightList = ["500g", "1kg", "2kg"];
 
 const ShopPage = () => {
 
@@ -26,29 +26,29 @@ const ShopPage = () => {
   const collectionQuery = query.get("collection");
   const occasionQuery = query.get("occasion");
 
-  const [products,setProducts] = useState([]);
-  const [categories,setCategories] = useState([]);
-  const [collections,setCollections] = useState([]);
-  const [occasions,setOccasions] = useState([]);
-  const [loading,setLoading] = useState(true);
+  const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [collections, setCollections] = useState([]);
+  const [occasions, setOccasions] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const [sort,setSort] = useState("");
-  const [maxPrice,setMaxPrice] = useState(5000);
+  const [sort, setSort] = useState("");
+  const [maxPrice, setMaxPrice] = useState(5000);
 
-  const [selectedFlavours,setSelectedFlavours] = useState([]);
-  const [selectedDiet,setSelectedDiet] = useState([]);
-  const [selectedCream,setSelectedCream] = useState([]);
-  const [selectedWeight,setSelectedWeight] = useState([]);
+  const [selectedFlavours, setSelectedFlavours] = useState([]);
+  const [selectedDiet, setSelectedDiet] = useState([]);
+  const [selectedCream, setSelectedCream] = useState([]);
+  const [selectedWeight, setSelectedWeight] = useState([]);
 
   /* FETCH DATA */
 
-  useEffect(()=>{
+  useEffect(() => {
 
-    const fetchData = async ()=>{
+    const fetchData = async () => {
 
-      try{
+      try {
 
-        const [prodRes,catRes,colRes,occRes] = await Promise.all([
+        const [prodRes, catRes, colRes, occRes] = await Promise.all([
           axios.get(`${API}/product/list`),
           axios.get(`${API}/meta/category`),
           axios.get(`${API}/meta/collection`),
@@ -60,9 +60,9 @@ const ShopPage = () => {
         setCollections(colRes.data);
         setOccasions(occRes.data);
 
-      }catch(err){
+      } catch (err) {
         console.log(err);
-      }finally{
+      } finally {
         setLoading(false);
       }
 
@@ -70,11 +70,11 @@ const ShopPage = () => {
 
     fetchData();
 
-  },[]);
+  }, []);
 
   /* FILTER ENGINE */
 
-  const filteredProducts = useMemo(()=>{
+  const filteredProducts = useMemo(() => {
 
     let result = [...products];
 
@@ -98,17 +98,17 @@ const ShopPage = () => {
 
     /* COLLECTION FILTER */
 
-    if(collectionQuery && collections.length){
+    if (collectionQuery && collections.length) {
 
       const col = collections.find(c => c.slug === collectionQuery);
 
-      if(col){
+      if (col) {
 
-        result = result.filter(product=>{
+        result = result.filter(product => {
 
-          if(!product.collectionId) return false;
+          if (!product.collectionId) return false;
 
-          if(typeof product.collectionId === "object"){
+          if (typeof product.collectionId === "object") {
             return (
               String(product.collectionId._id) === String(col._id) ||
               product.collectionId.slug === col.slug
@@ -125,17 +125,17 @@ const ShopPage = () => {
 
     /* OCCASION FILTER */
 
-    if(occasionQuery && occasions.length){
+    if (occasionQuery && occasions.length) {
 
       const occ = occasions.find(o => o.slug === occasionQuery);
 
-      if(occ){
+      if (occ) {
 
-        result = result.filter(product=>{
+        result = result.filter(product => {
 
-          if(!product.occasionId) return false;
+          if (!product.occasionId) return false;
 
-          if(typeof product.occasionId === "object"){
+          if (typeof product.occasionId === "object") {
             return (
               String(product.occasionId._id) === String(occ._id) ||
               product.occasionId.slug === occ.slug
@@ -152,39 +152,39 @@ const ShopPage = () => {
 
     /* FLAVOUR FILTER */
 
-    if(selectedFlavours.length)
-      result = result.filter(p=>selectedFlavours.includes(p.flavour));
+    if (selectedFlavours.length)
+      result = result.filter(p => selectedFlavours.includes(p.flavour));
 
     /* DIET FILTER */
 
-    if(selectedDiet.length)
-      result = result.filter(p=>selectedDiet.includes(p.diet));
+    if (selectedDiet.length)
+      result = result.filter(p => selectedDiet.includes(p.diet));
 
     /* CREAM FILTER */
 
-    if(selectedCream.length)
-      result = result.filter(p=>selectedCream.includes(p.cream));
+    if (selectedCream.length)
+      result = result.filter(p => selectedCream.includes(p.cream));
 
     /* WEIGHT FILTER */
 
-    if(selectedWeight.length)
-      result = result.filter(p=>selectedWeight.includes(p.weight));
+    if (selectedWeight.length)
+      result = result.filter(p => selectedWeight.includes(p.weight));
 
     /* PRICE FILTER */
 
-    result = result.filter(p=>p.price <= maxPrice);
+    result = result.filter(p => p.price <= maxPrice);
 
     /* SORT */
 
-    if(sort === "low")
-      result.sort((a,b)=>a.price-b.price);
+    if (sort === "low")
+      result.sort((a, b) => a.price - b.price);
 
-    if(sort === "high")
-      result.sort((a,b)=>b.price-a.price);
+    if (sort === "high")
+      result.sort((a, b) => b.price - a.price);
 
     return result;
 
-  },[
+  }, [
     products,
     collections,
     occasions,
@@ -203,19 +203,19 @@ const ShopPage = () => {
 
   let pageTitle = "All Cakes";
 
-  if(categoryQuery){
-    const cat = categories.find(c=>c.slug===categoryQuery);
-    if(cat) pageTitle = cat.name;
+  if (categoryQuery) {
+    const cat = categories.find(c => c.slug === categoryQuery);
+    if (cat) pageTitle = cat.name;
   }
 
-  if(collectionQuery){
-    const col = collections.find(c=>c.slug===collectionQuery);
-    if(col) pageTitle = col.name;
+  if (collectionQuery) {
+    const col = collections.find(c => c.slug === collectionQuery);
+    if (col) pageTitle = col.name;
   }
 
-  if(occasionQuery){
-    const occ = occasions.find(o=>o.slug===occasionQuery);
-    if(occ) pageTitle = occ.name;
+  if (occasionQuery) {
+    const occ = occasions.find(o => o.slug === occasionQuery);
+    if (occ) pageTitle = occ.name;
   }
 
   return (
@@ -232,16 +232,18 @@ const ShopPage = () => {
 
             <h3>Filters</h3>
 
+            {/* SORT */}
             <div className="filter-group">
               <label>Sort by Price</label>
 
-              <select value={sort} onChange={e=>setSort(e.target.value)}>
+              <select value={sort} onChange={e => setSort(e.target.value)}>
                 <option value="">Default</option>
                 <option value="low">Low → High</option>
                 <option value="high">High → Low</option>
               </select>
             </div>
 
+            {/* PRICE */}
             <div className="filter-group">
               <label>Max Price: ₹{maxPrice}</label>
 
@@ -250,12 +252,114 @@ const ShopPage = () => {
                 min="100"
                 max="5000"
                 value={maxPrice}
-                onChange={e=>setMaxPrice(Number(e.target.value))}
+                onChange={e => setMaxPrice(Number(e.target.value))}
               />
             </div>
 
-          </aside>
+            {/* FLAVOUR */}
+            <div className="filter-group">
+              <label>Flavour</label>
 
+              {flavoursList.map(f => (
+                <div className="checkbox" key={f}>
+                  <input
+                    type="checkbox"
+                    checked={selectedFlavours.includes(f)}
+                    onChange={() => {
+                      setSelectedFlavours(prev =>
+                        prev.includes(f)
+                          ? prev.filter(i => i !== f)
+                          : [...prev, f]
+                      );
+                    }}
+                  />
+                  <span>{f}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* DIET */}
+            <div className="filter-group">
+              <label>Diet</label>
+
+              {dietList.map(d => (
+                <div className="checkbox" key={d}>
+                  <input
+                    type="checkbox"
+                    checked={selectedDiet.includes(d)}
+                    onChange={() => {
+                      setSelectedDiet(prev =>
+                        prev.includes(d)
+                          ? prev.filter(i => i !== d)
+                          : [...prev, d]
+                      );
+                    }}
+                  />
+                  <span>{d}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* CREAM */}
+            <div className="filter-group">
+              <label>Cream</label>
+
+              {creamList.map(c => (
+                <div className="checkbox" key={c}>
+                  <input
+                    type="checkbox"
+                    checked={selectedCream.includes(c)}
+                    onChange={() => {
+                      setSelectedCream(prev =>
+                        prev.includes(c)
+                          ? prev.filter(i => i !== c)
+                          : [...prev, c]
+                      );
+                    }}
+                  />
+                  <span>{c}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* WEIGHT */}
+            <div className="filter-group">
+              <label>Weight</label>
+
+              {weightList.map(w => (
+                <div className="checkbox" key={w}>
+                  <input
+                    type="checkbox"
+                    checked={selectedWeight.includes(w)}
+                    onChange={() => {
+                      setSelectedWeight(prev =>
+                        prev.includes(w)
+                          ? prev.filter(i => i !== w)
+                          : [...prev, w]
+                      );
+                    }}
+                  />
+                  <span>{w}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* CLEAR BUTTON */}
+            <button
+              className="clear-btn"
+              onClick={() => {
+                setSort("");
+                setMaxPrice(5000);
+                setSelectedFlavours([]);
+                setSelectedDiet([]);
+                setSelectedCream([]);
+                setSelectedWeight([]);
+              }}
+            >
+              Clear Filters
+            </button>
+
+          </aside>
           {/* PRODUCTS */}
 
           <div className="products-section">
@@ -269,8 +373,8 @@ const ShopPage = () => {
 
               <div className="product-grid">
 
-                {Array.from({length:8}).map((_,i)=>(
-                  <ProductSkeleton key={i}/>
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <ProductSkeleton key={i} />
                 ))}
 
               </div>
@@ -279,11 +383,11 @@ const ShopPage = () => {
 
               <p className="empty-msg">No cakes found 😔</p>
 
-            :
+              :
 
               <div className="product-grid">
 
-                {filteredProducts.map(product=>(
+                {filteredProducts.map(product => (
                   <ProductCard
                     key={product._id}
                     product={product}

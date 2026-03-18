@@ -18,10 +18,16 @@ const productSchema = new mongoose.Schema({
 
   image: String,
 
-  /* ⭐ NEW FIELD */
+  /* ⭐ EXISTING */
   bestseller: {
     type: Boolean,
     default: false
+  },
+
+  /* 🔥 ADD THIS (VERY IMPORTANT) */
+  orders: {
+    type: Number,
+    default: 0
   },
 
   createdAt: {

@@ -201,7 +201,7 @@
 
 .modal-box{
   width:100%;
-  max-width:280px; /* 🔥 control size here */
+  max-width:280px; 
   max-height:85vh;
 
   background:linear-gradient(

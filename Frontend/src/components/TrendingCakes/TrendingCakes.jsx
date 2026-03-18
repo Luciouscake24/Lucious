@@ -10,35 +10,29 @@ const TrendingCakes = () => {
 
   const navigate = useNavigate();
 
-  const [collections,setCollections] = useState([]);
-  const [loading,setLoading] = useState(true);
+  const [cakes, setCakes] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  /* 🔥 Fetch collections from backend */
+  useEffect(() => {
 
-  useEffect(()=>{
+    const fetchTrending = async () => {
+      try {
 
-    axios
-      .get(`${API}/meta/collection`)
-      .then(res => {
+        const res = await axios.get(`${API}/trending`);
+        // OR → `${API}/product/trending`
 
-        setCollections(res.data);
-        setLoading(false);
+        setCakes(res.data);
 
-      })
-      .catch(err => {
-
+      } catch (err) {
         console.log(err);
+      } finally {
         setLoading(false);
+      }
+    };
 
-      });
+    fetchTrending();
 
-  },[]);
-
-  /* ⭐ Filter only trending category collections */
-
-  const trendingCollections = collections.filter(
-    col => col.categorySlug === "trending"
-  );
+  }, []);
 
   return (
 
@@ -50,38 +44,38 @@ const TrendingCakes = () => {
 
         {loading ? (
 
-          Array.from({length:4}).map((_,i)=>(
-            <ProductSkeleton key={i}/>
+          Array.from({ length: 10 }).map((_, i) => (
+            <ProductSkeleton key={i} />
           ))
 
-        ) : trendingCollections.length === 0 ? (
+        ) : cakes.length === 0 ? (
 
           <p>No trending cakes available</p>
 
         ) : (
 
-          trendingCollections.map(col => (
+          cakes.slice(0, 10).map((cake) => (  // 🔥 LIMIT HERE
 
-            <div className="trend-card" key={col._id}>
-
-              {/* Optimized Cloudinary image */}
+            <div className="trend-card" key={cake._id}>
 
               <img
-                src={optimizeImage(col.image)}
-                alt={col.name}
+                src={optimizeImage(cake.image)}
+                alt={cake.name}
                 loading="lazy"
-                onError={(e)=>{
-                  e.target.src="/cake-placeholder.jpg";
+                onError={(e) => {
+                  e.target.src = "/cake-placeholder.jpg";
                 }}
               />
 
-              <h3>{col.name}</h3>
+              <h3>{cake.name}</h3>
+
+              <span className="badge">🔥 Trending</span>
 
               <button
                 className="view-btn"
-                onClick={() => navigate(`/shop?collection=${col.slug}`)}
+                onClick={() => navigate(`/product/${cake._id}`)}
               >
-                View Cakes →
+                View Cake →
               </button>
 
             </div>

@@ -1,10 +1,11 @@
 import "./CategoryModal.css";
 import { X, ShoppingCart, ArrowLeft } from "lucide-react";
 import { useContext, useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { StoreContext } from "../../context/StoreContext";
 import axios from "axios";
 import API from "../../config/api";
-import { optimizeImage } from "../../utils/image";   // ⭐ NEW IMPORT
+import { optimizeImage } from "../../utils/image";
 
 const CategoryModal = ({ category, closeModal }) => {
 
@@ -12,14 +13,26 @@ const CategoryModal = ({ category, closeModal }) => {
 
   const [collections, setCollections] = useState([]);
   const [products, setProducts] = useState([]);
-
   const [selectedCollection, setSelectedCollection] = useState(null);
+
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState("default");
-  const [qty, setQty] = useState({});
+
+  /* 🔥 SECOND MODAL STATE */
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [showProductModal, setShowProductModal] = useState(false);
+
+  const [options, setOptions] = useState({
+    weight: "500g",
+    flavour: "chocolate",
+    date: "",
+    slot: "10AM - 1PM",
+    message: ""
+  });
+
+  const [adding, setAdding] = useState(false);
 
   /* BODY SCROLL LOCK */
-
   useEffect(() => {
     document.body.style.overflow = "hidden";
     return () => {
@@ -27,56 +40,44 @@ const CategoryModal = ({ category, closeModal }) => {
     };
   }, []);
 
-  /* FETCH COLLECTIONS + PRODUCTS */
-
+  /* LOCK WHEN INNER MODAL OPENS */
   useEffect(() => {
+    if (showProductModal) {
+      document.body.style.overflow = "hidden";
+    }
+  }, [showProductModal]);
 
-    axios
-      .get(`${API}/meta/collection`)
-      .then(res => {
-        console.log("Collections:", res.data);
-        setCollections(res.data);
-      });
+  /* FETCH DATA */
+  useEffect(() => {
+    axios.get(`${API}/meta/collection`)
+      .then(res => setCollections(res.data))
+      .catch(() => {});
 
-    axios
-      .get(`${API}/product/list`)
-      .then(res => {
-        console.log("Products:", res.data);
-        setProducts(res.data);
-      });
-
+    axios.get(`${API}/product/list`)
+      .then(res => setProducts(res.data))
+      .catch(() => {});
   }, []);
 
   if (!category) return null;
 
-  /* FILTER COLLECTIONS BY CATEGORY */
-
-  const categoryCollections = collections.filter(
-    col =>
-      col.categoryIds?.some(
-        id => id.toString() === category._id
-      )
+  /* FILTER COLLECTIONS */
+  const categoryCollections = collections.filter(col =>
+    col.categoryIds?.some(id => id.toString() === category._id)
   );
 
-  /* FILTER PRODUCTS BY COLLECTION */
-
+  /* FILTER PRODUCTS */
   let collectionProducts = [];
 
   if (selectedCollection) {
-
     collectionProducts = products.filter(
       p =>
         p.collectionId === selectedCollection._id ||
         p.collectionSlug === selectedCollection.slug
     );
 
-    /* SEARCH */
-
     collectionProducts = collectionProducts.filter(p =>
       p.name.toLowerCase().includes(search.toLowerCase())
     );
-
-    /* SORT */
 
     if (sort === "low") {
       collectionProducts.sort((a, b) => a.price - b.price);
@@ -85,238 +86,273 @@ const CategoryModal = ({ category, closeModal }) => {
     if (sort === "high") {
       collectionProducts.sort((a, b) => b.price - a.price);
     }
-
   }
 
-  /* CART FUNCTIONS */
+  /* ✅ CONFIRM ADD */
+  const confirmAdd = () => {
 
-  const handleAddFirstTime = (cake) => {
+    if (!options.date) {
+      alert("Select delivery date");
+      return;
+    }
 
-    setQty(prev => ({
-      ...prev,
-      [cake._id]: 1
-    }));
+    setAdding(true);
 
-    dispatch({
-      type: "ADD_TO_CART",
-      payload: { ...cake, quantity: 1 }
-    });
-
-  };
-
-  const changeQty = (id, type) => {
-
-    setQty(prev => {
-
-      const current = prev[id] || 0;
-
-      const newQty =
-        type === "inc"
-          ? current + 1
-          : Math.max(current - 1, 0);
+    setTimeout(() => {
 
       dispatch({
-        type: "UPDATE_CART_QTY",
-        payload: { id, quantity: newQty }
+        type: "ADD_TO_CART",
+        payload: {
+          ...selectedProduct,
+          weight: options.weight,
+          flavour: options.flavour,
+          deliveryDate: options.date,
+          deliverySlot: options.slot,
+          message: options.message
+        }
       });
 
-      return {
-        ...prev,
-        [id]: newQty
-      };
+      setAdding(false);
+      setShowProductModal(false);
 
-    });
-
+    }, 400);
   };
 
   return (
+    <>
+      {/* MAIN MODAL */}
+      <div className="category-modal-overlay" onClick={closeModal}>
+        
+        <div
+          className="category-modal-container"
+          onClick={(e) => e.stopPropagation()}
+        >
 
-    <div className="modal-overlay" onClick={closeModal}>
+          {/* HEADER */}
+          <div className="category-modal-header">
 
-      <div
-        className="modal-box"
-        onClick={(e) => e.stopPropagation()}
-      >
-
-        {/* HEADER */}
-
-        <div className="modal-header">
-
-          {selectedCollection && (
-            <ArrowLeft
-              className="back-btn"
-              onClick={() => setSelectedCollection(null)}
-            />
-          )}
-
-          <h2>
-            {selectedCollection
-              ? selectedCollection.name
-              : category.name}
-          </h2>
-
-          <X
-            onClick={closeModal}
-            className="close-btn"
-          />
-
-        </div>
-
-        {/* COLLECTION VIEW */}
-
-        {!selectedCollection && (
-
-          <div className="modal-products">
-
-            {categoryCollections.length === 0 && (
-              <p>No collections found</p>
+            {selectedCollection && (
+              <ArrowLeft
+                className="category-modal-icon"
+                onClick={() => setSelectedCollection(null)}
+              />
             )}
 
-            {categoryCollections.map((col) => (
+            <h2 className="category-modal-title">
+              {selectedCollection ? selectedCollection.name : category.name}
+            </h2>
 
-              <div
-                className="modal-card collection-card"
-                key={col._id}
-                onClick={() => setSelectedCollection(col)}
-              >
-
-                <img
-                  src={optimizeImage(col.image)}   // ⭐ OPTIMIZED
-                  alt={col.name}
-                  loading="lazy"
-                  onError={(e) => {
-                    e.target.src = "/placeholder.png";
-                  }}
-                />
-
-                <h3>{col.name}</h3>
-
-                <button className="add-btn">
-                  View Cakes
-                </button>
-
-              </div>
-
-            ))}
-
+            <X
+              onClick={closeModal}
+              className="category-modal-icon"
+            />
           </div>
 
-        )}
+          {/* COLLECTION VIEW */}
+          {!selectedCollection && (
+            <div className="category-modal-grid">
 
-        {/* PRODUCTS VIEW */}
-
-        {selectedCollection && (
-
-          <>
-
-            {/* SEARCH + SORT */}
-
-            <div className="modal-controls">
-
-              <input
-                type="text"
-                placeholder="Search cakes..."
-                onChange={(e) => setSearch(e.target.value)}
-              />
-
-              <select
-                onChange={(e) => setSort(e.target.value)}
-              >
-
-                <option value="default">
-                  Sort
-                </option>
-
-                <option value="low">
-                  Price Low → High
-                </option>
-
-                <option value="high">
-                  Price High → Low
-                </option>
-
-              </select>
-
-            </div>
-
-            {/* PRODUCTS */}
-
-            <div className="modal-products">
-
-              {collectionProducts.length === 0 && (
-                <p>No cakes found</p>
+              {categoryCollections.length === 0 && (
+                <p>No collections found</p>
               )}
 
-              {collectionProducts.map((cake) => (
-
+              {categoryCollections.map((col) => (
                 <div
-                  className="modal-card"
-                  key={cake._id}
+                  className="category-card"
+                  key={col._id}
+                  onClick={() => setSelectedCollection(col)}
                 >
-
                   <img
-                    src={optimizeImage(cake.image)}   // ⭐ OPTIMIZED
-                    alt={cake.name}
+                    className="category-card-img"
+                    src={optimizeImage(col.image)}
+                    alt={col.name}
                     loading="lazy"
-                    onError={(e) => {
-                      e.target.src = "/placeholder.png";
-                    }}
+                    onError={(e) => (e.target.src = "/placeholder.png")}
                   />
 
-                  <h3>{cake.name}</h3>
+                  <h3 className="category-card-title">{col.name}</h3>
 
-                  <p>₹{cake.price}</p>
-
-                  {!qty[cake._id] ? (
-
-                    <button
-                      className="add-btn"
-                      onClick={() => handleAddFirstTime(cake)}
-                    >
-                      <ShoppingCart size={16} />
-                      Add to Cart
-                    </button>
-
-                  ) : (
-
-                    <div className="qty">
-
-                      <button
-                        onClick={() => changeQty(cake._id, "dec")}
-                      >
-                        -
-                      </button>
-
-                      <span>
-                        {qty[cake._id]}
-                      </span>
-
-                      <button
-                        onClick={() => changeQty(cake._id, "inc")}
-                      >
-                        +
-                      </button>
-
-                    </div>
-
-                  )}
-
+                  <button className="category-card-btn">
+                    View Cakes
+                  </button>
                 </div>
-
               ))}
 
             </div>
+          )}
 
-          </>
+          {/* PRODUCTS VIEW */}
+          {selectedCollection && (
+            <>
+              <div className="category-modal-controls">
 
-        )}
+                <input
+                  className="category-modal-input"
+                  type="text"
+                  placeholder="Search cakes..."
+                  onChange={(e) => setSearch(e.target.value)}
+                />
 
+                <select
+                  className="category-modal-select"
+                  onChange={(e) => setSort(e.target.value)}
+                >
+                  <option value="default">Sort</option>
+                  <option value="low">Price Low → High</option>
+                  <option value="high">Price High → Low</option>
+                </select>
+
+              </div>
+
+              <div className="category-modal-grid">
+
+                {collectionProducts.length === 0 && (
+                  <p>No cakes found</p>
+                )}
+
+                {collectionProducts.map((cake) => (
+                  <div className="category-card" key={cake._id}>
+
+                    <img
+                      className="category-card-img"
+                      src={optimizeImage(cake.image)}
+                      alt={cake.name}
+                    />
+
+                    <h3 className="category-card-title">{cake.name}</h3>
+                    <p className="category-card-price">₹{cake.price}</p>
+
+                    <button
+                      className="category-card-btn"
+                      onClick={() => {
+                        setSelectedProduct(cake);
+                        setShowProductModal(true);
+                      }}
+                    >
+                      <ShoppingCart size={16} /> Add to Cart
+                    </button>
+
+                  </div>
+                ))}
+
+              </div>
+            </>
+          )}
+
+        </div>
       </div>
 
-    </div>
+      {/* 🔥 SECOND MODAL */}
+      {showProductModal && selectedProduct && createPortal(
 
+        <div
+          className="product-modal"
+          onClick={() => setShowProductModal(false)}
+        >
+
+          <div
+            className="modal-box"
+            onClick={(e) => e.stopPropagation()}
+          >
+
+            <button
+              className="modal-close"
+              onClick={() => setShowProductModal(false)}
+            >
+              ✕
+            </button>
+
+            <div className="modal-header">
+
+              <img
+                src={optimizeImage(selectedProduct.image)}
+                alt=""
+              />
+
+              <div>
+                <h2>{selectedProduct.name}</h2>
+                <p className="modal-price">₹{selectedProduct.price}</p>
+              </div>
+
+            </div>
+
+            {/* WEIGHT */}
+            <label>Choose Weight</label>
+            <div className="option-row">
+              {["500g", "1kg", "1.5kg"].map(w => (
+                <button
+                  key={w}
+                  className={`option-pill ${options.weight === w ? "active" : ""}`}
+                  onClick={() => setOptions({ ...options, weight: w })}
+                >
+                  {w}
+                </button>
+              ))}
+            </div>
+
+            {/* FLAVOUR */}
+            <label>Flavour</label>
+            <div className="option-row">
+              {["chocolate", "vanilla", "butterscotch"].map(f => (
+                <button
+                  key={f}
+                  className={`option-pill ${options.flavour === f ? "active" : ""}`}
+                  onClick={() => setOptions({ ...options, flavour: f })}
+                >
+                  {f}
+                </button>
+              ))}
+            </div>
+
+            {/* DATE */}
+            <label>Delivery Date</label>
+            <input
+              type="date"
+              className="modal-input"
+              onChange={(e) =>
+                setOptions({ ...options, date: e.target.value })
+              }
+            />
+
+            {/* SLOT */}
+            <label>Delivery Slot</label>
+            <select
+              className="modal-input"
+              onChange={(e) =>
+                setOptions({ ...options, slot: e.target.value })
+              }
+            >
+              <option>10AM - 1PM</option>
+              <option>1PM - 4PM</option>
+              <option>4PM - 7PM</option>
+            </select>
+
+            {/* MESSAGE */}
+            <label>Cake Message</label>
+            <input
+              className="modal-input"
+              placeholder="Happy Birthday..."
+              onChange={(e) =>
+                setOptions({ ...options, message: e.target.value })
+              }
+            />
+
+            <button
+              className="confirm-btn"
+              onClick={confirmAdd}
+              disabled={adding}
+            >
+              {adding ? "Adding..." : "Add to Cart"}
+            </button>
+
+          </div>
+        </div>,
+
+        document.body
+      )}
+
+    </>
   );
-
 };
 
 export default CategoryModal;
